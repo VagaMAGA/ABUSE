@@ -30,6 +30,8 @@ contract ConfigSyncTest is Test {
         assertEq(hub.BOOST_FEE(), 0.0001 ether);
         assertEq(hub.BOOST_DURATION(), 1 hours);
         assertEq(hub.BOOST_GM_MULTIPLIER(), 2);
+        assertEq(hub.AIRDROP_MIN_POINTS(), 500);
+        assertEq(hub.POINTS_PER_A_TOKEN(), 100);
     }
 
     function test_badgeCount_is24() public view {

@@ -3,17 +3,35 @@ pragma solidity ^0.8.24;
 
 import {Test} from "forge-std/Test.sol";
 import {Hub} from "../src/Hub.sol";
+import {AbuseToken} from "../src/AbuseToken.sol";
 
 contract HubTest is Test {
     Hub internal hub;
+    AbuseToken internal token;
     uint256 internal aliceKey = 0xA11CE;
     address internal alice;
 
     function setUp() public {
         alice = vm.addr(aliceKey);
         hub = new Hub();
+        token = new AbuseToken(address(hub), 1_000_000 ether);
+        hub.setAirdropToken(address(token));
         hub.setTreasury(alice);
         vm.deal(alice, 1 ether);
+    }
+
+    function _earnPoints(uint256 target) internal {
+        while (hub.points(alice) < target) {
+            if (hub.freeGmsRemaining(alice) == 0) {
+                vm.startBroadcast(aliceKey);
+                hub.gm{value: hub.GM_FEE()}();
+                vm.stopBroadcast();
+            } else {
+                vm.prank(alice);
+                hub.gm();
+            }
+            vm.warp(block.timestamp + hub.MIN_INTERVAL());
+        }
     }
 
     function test_freeGm_awardsPoints() public {
@@ -238,5 +256,36 @@ contract HubTest is Test {
         hub.gm();
 
         assertEq(hub.points(alice), alicePts);
+    }
+
+    function test_claimAirdrop_burnsPointsAndMintsA() public {
+        _earnPoints(600);
+        uint256 before = hub.points(alice);
+
+        vm.prank(alice);
+        hub.claimAirdrop(500);
+
+        assertEq(hub.points(alice), before - 500);
+        assertEq(hub.airdropClaimed(alice), hub.previewAirdropTokens(500));
+        assertEq(token.balanceOf(alice), 5 ether);
+        assertEq(token.balanceOf(address(hub)), 1_000_000 ether - 5 ether);
+    }
+
+    function test_revert_claimAirdrop_belowMinimum() public {
+        vm.prank(alice);
+        hub.gm();
+
+        vm.prank(alice);
+        vm.expectRevert(
+            abi.encodeWithSelector(Hub.AirdropBelowMinimum.selector, 500, 10)
+        );
+        hub.claimAirdrop(10);
+    }
+
+    function test_revert_claimAirdrop_notConfigured() public {
+        Hub bare = new Hub();
+        vm.prank(alice);
+        vm.expectRevert(Hub.AirdropNotConfigured.selector);
+        bare.claimAirdrop(500);
     }
 }

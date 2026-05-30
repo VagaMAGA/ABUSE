@@ -3,6 +3,11 @@ pragma solidity ^0.8.24;
 
 import {SimpleToken} from "./SimpleToken.sol";
 
+interface IERC20Minimal {
+    function balanceOf(address account) external view returns (uint256);
+    function transfer(address to, uint256 amount) external returns (bool);
+}
+
 /// @title Hub — example onchain actions on Base (template)
 contract Hub {
     uint256 public constant POINTS_PER_FREE_GM = 10;
@@ -22,6 +27,11 @@ contract Hub {
     uint256 public constant BOOST_FEE = 0.0001 ether;
     uint256 public constant BOOST_DURATION = 1 hours;
     uint256 public constant BOOST_GM_MULTIPLIER = 2;
+
+    /// @dev Minimum points balance required before any $A claim
+    uint256 public constant AIRDROP_MIN_POINTS = 500;
+    /// @dev Whole $A tokens (18 decimals) received per this many points spent
+    uint256 public constant POINTS_PER_A_TOKEN = 100;
 
     uint256 public totalGms;
     uint256 public totalDeploys;
@@ -48,6 +58,9 @@ contract Hub {
     mapping(address => uint256) public lastBoostDay;
     mapping(address => uint256) public freeBoostsUsedToday;
     mapping(address => uint256) public boostCount;
+
+    address public airdropToken;
+    mapping(address => uint256) public airdropClaimed;
 
     event GM(
         address indexed user,
@@ -87,6 +100,13 @@ contract Hub {
         uint256 refereePoints
     );
 
+    event AirdropClaimed(
+        address indexed user,
+        uint256 pointsSpent,
+        uint256 tokensReceived,
+        uint256 pointsRemaining
+    );
+
     error GmTooSoon(uint256 availableAt);
     error InvalidReferralCode();
     error ReferralCodeAlreadyRegistered();
@@ -96,6 +116,10 @@ contract Hub {
     error IncorrectFee(uint256 required);
     error EmptyString();
     error ZeroSupply();
+    error AirdropNotConfigured();
+    error AirdropBelowMinimum(uint256 required, uint256 available);
+    error AirdropInsufficientPoints(uint256 requested, uint256 available);
+    error AirdropZeroClaim();
 
     constructor() {
         owner = msg.sender;
@@ -106,6 +130,44 @@ contract Hub {
         require(msg.sender == owner, "not owner");
         require(newTreasury != address(0), "zero treasury");
         treasury = newTreasury;
+    }
+
+    function setAirdropToken(address token) external {
+        require(msg.sender == owner, "not owner");
+        require(token != address(0), "zero token");
+        airdropToken = token;
+    }
+
+    /// @notice Points → $A conversion for a given spend amount (18-decimal tokens)
+    function previewAirdropTokens(uint256 pointsAmount) public pure returns (uint256) {
+        return (pointsAmount * 1e18) / POINTS_PER_A_TOKEN;
+    }
+
+    /// @notice Burn Hub points and receive $A from the airdrop pool
+    function claimAirdrop(uint256 pointsToSpend) external {
+        if (airdropToken == address(0)) revert AirdropNotConfigured();
+        if (pointsToSpend == 0) revert AirdropZeroClaim();
+
+        uint256 available = points[msg.sender];
+        if (available < AIRDROP_MIN_POINTS) {
+            revert AirdropBelowMinimum(AIRDROP_MIN_POINTS, available);
+        }
+        if (pointsToSpend > available) {
+            revert AirdropInsufficientPoints(pointsToSpend, available);
+        }
+
+        uint256 tokensOut = previewAirdropTokens(pointsToSpend);
+        require(
+            IERC20Minimal(airdropToken).balanceOf(address(this)) >= tokensOut,
+            "pool empty"
+        );
+
+        points[msg.sender] = available - pointsToSpend;
+        airdropClaimed[msg.sender] += tokensOut;
+
+        require(IERC20Minimal(airdropToken).transfer(msg.sender, tokensOut), "transfer failed");
+
+        emit AirdropClaimed(msg.sender, pointsToSpend, tokensOut, points[msg.sender]);
     }
 
     /// @notice Deterministic 6-character code for `user` (must match frontend `referralCodeFromAddress`).

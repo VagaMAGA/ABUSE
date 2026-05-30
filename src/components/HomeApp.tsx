@@ -7,6 +7,7 @@ import { useAccount, useChainId, useSwitchChain } from "wagmi";
 
 import { APP_NAME, TOKEN_SYMBOL } from "@/config/app";
 import { AppNav } from "@/components/AppNav";
+import { AirdropOrbLink } from "@/components/AirdropOrbLink";
 import { ConnectWallet } from "@/components/ConnectWallet";
 import { PreviewBanner } from "@/components/PreviewBanner";
 import { BoostPanel } from "@/components/BoostPanel";
@@ -66,12 +67,17 @@ export function HomeApp() {
     <>
       <AppNav />
 
-      <header className="uni-card px-5 py-5 text-center">
-        <p className="uni-eyebrow">
+      <header className="uni-card px-5 py-5">
+        <p className="uni-eyebrow text-center">
           {inMiniApp ? "Farcaster" : "Web"} · Base
         </p>
-        <h1 className="uni-title mt-2 text-3xl">{APP_NAME}</h1>
-        <p className="uni-body mt-2 text-sm">
+        <div className="mt-2 flex w-full justify-center">
+          <div className="flex max-w-full flex-row flex-nowrap items-center justify-center gap-3.5">
+            <h1 className="uni-title shrink-0 text-3xl leading-none">{APP_NAME}</h1>
+            <AirdropOrbLink />
+          </div>
+        </div>
+        <p className="uni-body mx-auto mt-2 max-w-sm text-center text-sm">
           GM, Boost, deploy tokens, refer friends, and earn NFT badges for the{" "}
           <span className="uni-text-accent font-semibold">{TOKEN_SYMBOL}</span> airdrop on
           Base.

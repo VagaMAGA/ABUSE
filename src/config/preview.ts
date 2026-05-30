@@ -41,6 +41,17 @@ export function isBadgeLiveMode(opts: {
   return isHubLiveMode(opts) && isBadgeContractConfigured;
 }
 
+export function isAirdropLiveMode(opts: {
+  isConnected: boolean;
+  wrongChain: boolean;
+  airdropConfigured: boolean;
+}): boolean {
+  return isHubLiveMode(opts) && opts.airdropConfigured;
+}
+
+export const PREVIEW_A_CLAIMED = "12.4";
+export const PREVIEW_CLAIM_POINTS = 600;
+
 export const PREVIEW_REFERRALS: ReferralRedemption[] = [
   {
     referee: PREVIEW_ADDR_1,
