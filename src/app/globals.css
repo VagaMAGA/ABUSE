@@ -439,7 +439,7 @@ a.uni-tab.uni-tab-active {
   box-shadow: var(--uni-shadow-glow);
 }
 
-/* Farm tab — tB label + soft pulse when not active */
+/* Farm tab — $A label + soft pulse when not active */
 .uni-tab-tb-mark {
   font-weight: 700;
   color: var(--uni-pink);
@@ -608,18 +608,14 @@ a.uni-tab.uni-tab-active {
   }
 }
 
-/* ── Badges page ── */
+/* ── Badges page — Blood Void stamp style ── */
 .uni-badges-hero {
   position: relative;
   overflow: hidden;
-  border-radius: var(--uni-radius-xl);
-  border: 1px solid var(--uni-border);
+  border: 1px solid var(--uni-border-strong);
+  border-left: 4px solid var(--uni-pink);
   background:
-    radial-gradient(
-      ellipse 90% 80% at 50% -20%,
-      rgba(255, 107, 53, 0.26),
-      transparent 60%
-    ),
+    linear-gradient(180deg, rgba(255, 45, 85, 0.08) 0%, transparent 42%),
     var(--uni-surface-1);
   box-shadow: var(--uni-shadow-card);
 }
@@ -628,10 +624,12 @@ a.uni-tab.uni-tab-active {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(0, 0, 0, 0.15) 100%
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 8px,
+    rgba(255, 45, 85, 0.03) 8px,
+    rgba(255, 45, 85, 0.03) 9px
   );
   pointer-events: none;
 }
@@ -649,22 +647,21 @@ a.uni-tab.uni-tab-active {
 
 .uni-badges-stat {
   padding: 0.75rem 0.875rem;
-  border-radius: var(--uni-radius-lg);
   border: 1px solid var(--uni-border);
-  background: rgba(0, 0, 0, 0.22);
+  border-top: 3px solid var(--uni-pink);
+  background: rgba(0, 0, 0, 0.28);
 }
 
 .uni-badges-stat-value {
   font-size: 1.25rem;
   font-weight: 600;
   line-height: 1.2;
-  color: var(--uni-text);
+  color: var(--uni-pink);
 }
 
 .uni-badges-collection {
   margin-top: 1rem;
   padding: 0.875rem 1rem;
-  border-radius: var(--uni-radius-lg);
   border: 1px solid var(--uni-border);
   background: var(--uni-bg-elevated);
 }
@@ -672,13 +669,12 @@ a.uni-tab.uni-tab-active {
 .uni-badges-collection-bar {
   height: 6px;
   overflow: hidden;
-  border-radius: var(--uni-radius-pill);
   background: var(--uni-surface-2);
+  border: 1px solid var(--uni-border);
 }
 
 .uni-badges-collection-fill {
   height: 100%;
-  border-radius: var(--uni-radius-pill);
   background: var(--uni-gradient-primary);
   transition: width 0.4s ease;
 }
@@ -688,15 +684,17 @@ a.uni-tab.uni-tab-active {
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0.25rem;
   padding: 0.25rem;
-  border-radius: var(--uni-radius-pill);
   background: var(--uni-surface-2);
   border: 1px solid var(--uni-border);
 }
 
+.uni-badges-tabs-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .uni-badges-tab {
   padding: 0.4375rem 0.25rem;
-  border: none;
-  border-radius: var(--uni-radius-pill);
+  border: 1px solid transparent;
   background: transparent;
   font-size: 0.6875rem;
   font-weight: 600;
@@ -706,17 +704,18 @@ a.uni-tab.uni-tab-active {
   transition:
     background-color 0.15s ease,
     color 0.15s ease,
-    box-shadow 0.15s ease;
+    border-color 0.15s ease;
 }
 
 .uni-badges-tab:hover {
   color: var(--uni-text);
+  border-color: var(--uni-border);
 }
 
 .uni-badges-tab-active {
   background: var(--uni-surface-1);
   color: var(--uni-pink);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  border-color: var(--uni-pink);
 }
 
 .uni-badge-grid {
@@ -733,16 +732,16 @@ a.uni-tab.uni-tab-active {
   padding: 0.25rem 0.125rem 0;
   font-size: 0.75rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--uni-text-tertiary);
+  color: var(--uni-pink);
 }
 
 .uni-badge-section-title::after {
   content: "";
   flex: 1;
-  height: 1px;
-  background: var(--uni-border);
+  height: 2px;
+  background: var(--uni-gradient-primary);
 }
 
 .uni-badge-card {
@@ -752,8 +751,8 @@ a.uni-tab.uni-tab-active {
   align-items: center;
   gap: 0.625rem;
   padding: 0.875rem 0.75rem 0.75rem;
-  border-radius: var(--uni-radius-lg);
   border: 1px solid var(--uni-border);
+  border-top: 3px solid var(--uni-border-strong);
   background: var(--uni-bg-elevated);
   text-align: center;
   transition:
@@ -763,77 +762,96 @@ a.uni-tab.uni-tab-active {
     opacity 0.2s ease;
 }
 
+.uni-badge-card-stamp {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  background: var(--uni-pink);
+}
+
 .uni-badge-card:hover {
-  border-color: var(--uni-border-strong);
+  border-color: var(--uni-accent-border);
 }
 
 .uni-badge-card-tier-bronze {
-  border-color: rgba(205, 127, 50, 0.28);
+  border-top-color: #801825;
   background: linear-gradient(
-    165deg,
-    rgba(205, 127, 50, 0.07) 0%,
-    var(--uni-bg-elevated) 45%
+    180deg,
+    rgba(128, 24, 37, 0.14) 0%,
+    var(--uni-bg-elevated) 38%
   );
 }
 
 .uni-badge-card-tier-silver {
-  border-color: rgba(192, 192, 192, 0.28);
+  border-top-color: #c41e3a;
   background: linear-gradient(
-    165deg,
-    rgba(192, 192, 192, 0.08) 0%,
-    var(--uni-bg-elevated) 45%
+    180deg,
+    rgba(196, 30, 58, 0.12) 0%,
+    var(--uni-bg-elevated) 38%
   );
 }
 
 .uni-badge-card-tier-gold {
-  border-color: rgba(255, 215, 0, 0.28);
+  border-top-color: #ff2d55;
   background: linear-gradient(
-    165deg,
-    rgba(255, 215, 0, 0.09) 0%,
-    var(--uni-bg-elevated) 45%
+    180deg,
+    rgba(255, 45, 85, 0.14) 0%,
+    var(--uni-bg-elevated) 38%
   );
 }
 
 .uni-badge-card-tier-platinum {
-  border-color: rgba(168, 196, 220, 0.32);
+  border-top-color: #ff6b35;
   background: linear-gradient(
-    165deg,
-    rgba(168, 196, 220, 0.1) 0%,
-    var(--uni-bg-elevated) 45%
+    180deg,
+    rgba(255, 107, 53, 0.16) 0%,
+    var(--uni-bg-elevated) 38%
   );
 }
 
 .uni-badge-card-ready.uni-badge-card-tier-bronze {
-  border-color: rgba(205, 127, 50, 0.55);
-  box-shadow: 0 0 0 1px rgba(205, 127, 50, 0.15), 0 8px 24px rgba(205, 127, 50, 0.12);
+  border-color: rgba(128, 24, 37, 0.55);
+  box-shadow:
+    inset 0 0 0 1px rgba(128, 24, 37, 0.2),
+    0 0 24px rgba(128, 24, 37, 0.18);
 }
 
 .uni-badge-card-ready.uni-badge-card-tier-silver {
-  border-color: rgba(192, 192, 192, 0.55);
-  box-shadow: 0 0 0 1px rgba(192, 192, 192, 0.15), 0 8px 24px rgba(192, 192, 192, 0.1);
+  border-color: rgba(196, 30, 58, 0.55);
+  box-shadow:
+    inset 0 0 0 1px rgba(196, 30, 58, 0.2),
+    0 0 24px rgba(196, 30, 58, 0.16);
 }
 
 .uni-badge-card-ready.uni-badge-card-tier-gold {
-  border-color: rgba(255, 215, 0, 0.55);
-  box-shadow: 0 0 0 1px rgba(255, 215, 0, 0.15), 0 8px 28px rgba(255, 215, 0, 0.14);
+  border-color: rgba(255, 45, 85, 0.6);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 45, 85, 0.22),
+    0 0 28px rgba(255, 45, 85, 0.22);
 }
 
 .uni-badge-card-ready.uni-badge-card-tier-platinum {
-  border-color: rgba(168, 196, 220, 0.6);
-  box-shadow: 0 0 0 1px rgba(168, 196, 220, 0.18), 0 8px 28px rgba(168, 196, 220, 0.16);
+  border-color: rgba(255, 107, 53, 0.65);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 107, 53, 0.24),
+    0 0 32px rgba(255, 107, 53, 0.24);
 }
 
 .uni-badge-card-minted {
-  border-color: rgba(64, 182, 107, 0.45);
+  border-color: rgba(255, 107, 53, 0.55);
+  border-top-color: #ff6b35;
   background: linear-gradient(
     180deg,
-    rgba(64, 182, 107, 0.08) 0%,
+    rgba(255, 107, 53, 0.12) 0%,
     var(--uni-bg-elevated) 55%
   );
 }
 
 .uni-badge-card-locked {
-  opacity: 0.72;
+  opacity: 0.58;
+  filter: saturate(0.65);
 }
 
 .uni-badge-medallion {
@@ -841,196 +859,186 @@ a.uni-tab.uni-tab-active {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: 0;
+  width: 3.75rem;
+  height: 3.75rem;
   border: 2px solid var(--uni-border-strong);
   background: var(--uni-surface-2);
   color: var(--uni-text);
+  box-shadow: inset 0 0 0 3px var(--uni-bg);
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
 }
 
-.uni-badge-card-ready .uni-badge-medallion {
-  animation: uni-badge-pulse 2.4s ease-in-out infinite;
-}
-
-.uni-badge-card-ready.uni-badge-card-tier-bronze .uni-badge-medallion {
-  box-shadow: 0 0 20px rgba(205, 127, 50, 0.45);
-}
-
-.uni-badge-card-ready.uni-badge-card-tier-silver .uni-badge-medallion {
-  box-shadow: 0 0 20px rgba(192, 192, 192, 0.35);
-}
-
-.uni-badge-card-ready.uni-badge-card-tier-gold .uni-badge-medallion {
-  box-shadow: 0 0 24px rgba(255, 215, 0, 0.4);
-}
-
-.uni-badge-card-ready.uni-badge-card-tier-platinum .uni-badge-medallion {
-  box-shadow: 0 0 26px rgba(168, 196, 220, 0.45);
-}
-
 .uni-badge-medallion-bronze {
-  border-color: rgba(205, 127, 50, 0.65);
-  background: linear-gradient(145deg, #a0622a 0%, #cd7f32 38%, #5c3a1e 100%);
-  color: #ffe8c8;
-  box-shadow:
-    inset 0 2px 4px rgba(255, 220, 180, 0.35),
-    inset 0 -3px 6px rgba(0, 0, 0, 0.35);
+  border-color: #801825;
+  background: #0a0608;
+  color: #801825;
+  box-shadow: inset 0 0 0 2px rgba(10, 6, 8, 0.9);
 }
 
 .uni-badge-medallion-silver {
-  border-color: rgba(220, 220, 220, 0.7);
-  background: linear-gradient(145deg, #f0f0f0 0%, #b8b8b8 42%, #6e6e6e 100%);
-  color: #2a2a2a;
-  box-shadow:
-    inset 0 2px 4px rgba(255, 255, 255, 0.55),
-    inset 0 -3px 6px rgba(0, 0, 0, 0.3);
+  border-color: #c41e3a;
+  background: #0a0608;
+  color: #c41e3a;
+  box-shadow: inset 0 0 0 2px rgba(10, 6, 8, 0.9);
 }
 
 .uni-badge-medallion-gold {
-  border-color: rgba(255, 223, 100, 0.75);
-  background: linear-gradient(145deg, #fff1a8 0%, #ffd700 35%, #b8860b 100%);
-  color: #5c4200;
-  box-shadow:
-    inset 0 2px 4px rgba(255, 250, 210, 0.6),
-    inset 0 -3px 6px rgba(120, 80, 0, 0.35);
+  border-color: #ff2d55;
+  background: #0a0608;
+  color: #ff2d55;
+  box-shadow: inset 0 0 0 2px rgba(10, 6, 8, 0.9);
 }
 
 .uni-badge-medallion-platinum {
-  border-color: rgba(200, 220, 240, 0.8);
-  background: linear-gradient(145deg, #f4f8fc 0%, #c8d8e8 38%, #7a8fa3 100%);
-  color: #2a3540;
-  box-shadow:
-    inset 0 2px 4px rgba(255, 255, 255, 0.65),
-    inset 0 -3px 6px rgba(40, 55, 70, 0.35);
+  border-color: #ff6b35;
+  background: #0a0608;
+  color: #ff6b35;
+  box-shadow: inset 0 0 0 2px rgba(10, 6, 8, 0.9);
 }
 
 .uni-badge-tier-chip {
   display: inline-flex;
   align-items: center;
   padding: 0.1875rem 0.5rem;
-  border-radius: var(--uni-radius-pill);
   font-size: 0.5625rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .uni-badge-tier-bronze {
-  background: rgba(205, 127, 50, 0.18);
-  color: #e8a55a;
-  border: 1px solid rgba(205, 127, 50, 0.35);
+  background: rgba(128, 24, 37, 0.2);
+  color: #ff8fa3;
+  border: 1px solid rgba(128, 24, 37, 0.45);
 }
 
 .uni-badge-tier-silver {
-  background: rgba(192, 192, 192, 0.14);
-  color: #d4d4d4;
-  border: 1px solid rgba(192, 192, 192, 0.35);
+  background: rgba(196, 30, 58, 0.18);
+  color: #ff6b85;
+  border: 1px solid rgba(196, 30, 58, 0.45);
 }
 
 .uni-badge-tier-gold {
-  background: rgba(255, 215, 0, 0.12);
-  color: #ffd700;
-  border: 1px solid rgba(255, 215, 0, 0.35);
+  background: rgba(255, 45, 85, 0.16);
+  color: #ff5070;
+  border: 1px solid rgba(255, 45, 85, 0.45);
 }
 
 .uni-badge-tier-platinum {
-  background: rgba(168, 196, 220, 0.14);
-  color: #d4e4f4;
-  border: 1px solid rgba(168, 196, 220, 0.4);
+  background: rgba(255, 107, 53, 0.16);
+  color: #ff8f66;
+  border: 1px solid rgba(255, 107, 53, 0.5);
 }
 
 .uni-badge-progress-fill-bronze {
-  background: linear-gradient(90deg, #8b5a2b, #cd7f32);
+  background: linear-gradient(90deg, #4a1020, #801825);
 }
 
 .uni-badge-progress-fill-silver {
-  background: linear-gradient(90deg, #888, #e0e0e0);
+  background: linear-gradient(90deg, #801825, #c41e3a);
 }
 
 .uni-badge-progress-fill-gold {
-  background: linear-gradient(90deg, #b8860b, #ffd700);
+  background: linear-gradient(90deg, #c41e3a, #ff2d55);
 }
 
 .uni-badge-progress-fill-platinum {
-  background: linear-gradient(90deg, #7a8fa3, #e8f0f8);
+  background: linear-gradient(90deg, #ff2d55, #ff6b35);
 }
 
 .uni-badge-mint-btn-bronze:not(:disabled):not(.uni-badge-mint-btn-secondary) {
-  background: linear-gradient(180deg, #cd7f32, #8b5a2b);
+  background: linear-gradient(180deg, #801825, #4a1020);
+  color: #ffe8ec;
 }
 
 .uni-badge-mint-btn-bronze:not(:disabled):not(.uni-badge-mint-btn-secondary):hover {
-  background: linear-gradient(180deg, #e8a55a, #a0622a);
+  background: linear-gradient(180deg, #a02030, #5c1424);
 }
 
 .uni-badge-mint-btn-silver:not(:disabled):not(.uni-badge-mint-btn-secondary) {
-  background: linear-gradient(180deg, #d8d8d8, #888);
-  color: #1a1a1a;
+  background: linear-gradient(180deg, #c41e3a, #801825);
+  color: #fff0f3;
 }
 
 .uni-badge-mint-btn-silver:not(:disabled):not(.uni-badge-mint-btn-secondary):hover {
-  background: linear-gradient(180deg, #f0f0f0, #999);
+  background: linear-gradient(180deg, #e02848, #962030);
 }
 
 .uni-badge-mint-btn-gold:not(:disabled):not(.uni-badge-mint-btn-secondary) {
-  background: linear-gradient(180deg, #ffd700, #b8860b);
-  color: #3d2e00;
+  background: linear-gradient(180deg, #ff2d55, #c41e3a);
+  color: #0a0608;
 }
 
 .uni-badge-mint-btn-gold:not(:disabled):not(.uni-badge-mint-btn-secondary):hover {
-  background: linear-gradient(180deg, #ffe566, #d4a017);
+  background: linear-gradient(180deg, #ff5070, #ff2d55);
 }
 
 .uni-badge-mint-btn-platinum:not(:disabled):not(.uni-badge-mint-btn-secondary) {
-  background: linear-gradient(180deg, #e8f0f8, #7a8fa3);
-  color: #1a2430;
+  background: linear-gradient(180deg, #ff6b35, #ff2d55);
+  color: #0a0608;
 }
 
 .uni-badge-mint-btn-platinum:not(:disabled):not(.uni-badge-mint-btn-secondary):hover {
-  background: linear-gradient(180deg, #f8fcff, #8fa3b8);
+  background: linear-gradient(180deg, #ff8f66, #ff6b35);
 }
 
 @keyframes uni-badge-pulse-bronze {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(205, 127, 50, 0.4);
+    box-shadow:
+      inset 0 0 0 3px rgba(10, 6, 8, 0.85),
+      0 0 0 0 rgba(128, 24, 37, 0.45);
   }
   50% {
-    box-shadow: 0 0 0 6px rgba(205, 127, 50, 0);
+    box-shadow:
+      inset 0 0 0 3px rgba(10, 6, 8, 0.85),
+      0 0 0 6px rgba(128, 24, 37, 0);
   }
 }
 
 @keyframes uni-badge-pulse-silver {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(192, 192, 192, 0.35);
+    box-shadow:
+      inset 0 0 0 3px rgba(10, 6, 8, 0.85),
+      0 0 0 0 rgba(196, 30, 58, 0.4);
   }
   50% {
-    box-shadow: 0 0 0 6px rgba(192, 192, 192, 0);
+    box-shadow:
+      inset 0 0 0 3px rgba(10, 6, 8, 0.85),
+      0 0 0 6px rgba(196, 30, 58, 0);
   }
 }
 
 @keyframes uni-badge-pulse-gold {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.45);
+    box-shadow:
+      inset 0 0 0 3px rgba(10, 6, 8, 0.8),
+      0 0 0 0 rgba(255, 45, 85, 0.45);
   }
   50% {
-    box-shadow: 0 0 0 6px rgba(255, 215, 0, 0);
+    box-shadow:
+      inset 0 0 0 3px rgba(10, 6, 8, 0.8),
+      0 0 0 6px rgba(255, 45, 85, 0);
   }
 }
 
 @keyframes uni-badge-pulse-platinum {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(168, 196, 220, 0.45);
+    box-shadow:
+      inset 0 0 0 3px rgba(10, 6, 8, 0.75),
+      0 0 18px rgba(255, 107, 53, 0.35),
+      0 0 0 0 rgba(255, 107, 53, 0.45);
   }
   50% {
-    box-shadow: 0 0 0 6px rgba(168, 196, 220, 0);
+    box-shadow:
+      inset 0 0 0 3px rgba(10, 6, 8, 0.75),
+      0 0 18px rgba(255, 107, 53, 0.35),
+      0 0 0 6px rgba(255, 107, 53, 0);
   }
 }
 
@@ -1059,80 +1067,84 @@ a.uni-tab.uni-tab-active {
   justify-content: center;
   width: 1.125rem;
   height: 1.125rem;
-  border-radius: 0;
   border: 2px solid var(--uni-bg-elevated);
-  background: var(--uni-success);
-  color: #fff;
+  background: var(--uni-pink);
+  color: #0a0608;
 }
 
 .uni-badge-chip {
   display: inline-flex;
   align-items: center;
   padding: 0.1875rem 0.5rem;
-  border-radius: var(--uni-radius-pill);
   font-size: 0.625rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .uni-badge-chip-ready {
-  background: var(--uni-pink-muted);
+  background: rgba(255, 45, 85, 0.16);
   color: var(--uni-pink);
+  border: 1px solid rgba(255, 45, 85, 0.35);
 }
 
 .uni-badge-chip-minted {
-  background: rgba(64, 182, 107, 0.15);
+  background: rgba(255, 107, 53, 0.16);
   color: var(--uni-success);
+  border: 1px solid rgba(255, 107, 53, 0.35);
 }
 
 .uni-badge-chip-locked {
   background: var(--uni-surface-2);
   color: var(--uni-text-tertiary);
+  border: 1px solid var(--uni-border);
 }
 
 .uni-badge-progress {
   width: 100%;
-  height: 4px;
+  height: 5px;
   overflow: hidden;
-  border-radius: var(--uni-radius-pill);
   background: var(--uni-surface-2);
+  border: 1px solid var(--uni-border);
 }
 
 .uni-badge-progress-fill {
   height: 100%;
-  border-radius: var(--uni-radius-pill);
   transition: width 0.35s ease;
 }
 
 .uni-badge-progress-fill-minted {
-  background: var(--uni-success);
+  background: var(--uni-gradient-primary);
 }
 
 .uni-badge-mint-btn {
   width: 100%;
   padding: 0.5rem 0.625rem;
-  border: none;
-  border-radius: var(--uni-radius-md);
+  border: 1px solid transparent;
   background: var(--uni-gradient-primary);
   color: var(--uni-on-accent);
   font-size: 0.75rem;
   font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   cursor: pointer;
   transition:
     background-color 0.15s ease,
     transform 0.1s ease,
-    opacity 0.15s ease;
+    opacity 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .uni-badge-card-minted .uni-badge-medallion {
-  border-color: rgba(64, 182, 107, 0.6);
-  box-shadow: 0 0 16px rgba(64, 182, 107, 0.25);
+  border-color: #ff6b35;
+  box-shadow:
+    inset 0 0 0 3px rgba(10, 6, 8, 0.75),
+    0 0 20px rgba(255, 107, 53, 0.3);
 }
 
-.uni-badge-mint-btn:hover:not(:disabled):not(.uni-badge-mint-btn-secondary):not(.uni-badge-mint-btn-bronze):not(.uni-badge-mint-btn-silver):not(.uni-badge-mint-btn-gold) {
-  background: var(--uni-gradient-primary);
+.uni-badge-mint-btn:hover:not(:disabled):not(.uni-badge-mint-btn-secondary):not(.uni-badge-mint-btn-bronze):not(.uni-badge-mint-btn-silver):not(.uni-badge-mint-btn-gold):not(.uni-badge-mint-btn-platinum) {
   filter: brightness(1.08);
+  border-color: var(--uni-accent-border);
 }
 
 .uni-badge-mint-btn:active:not(:disabled) {
@@ -1147,4 +1159,57 @@ a.uni-tab.uni-tab-active {
 .uni-badge-mint-btn-secondary {
   background: var(--uni-surface-2);
   color: var(--uni-text-secondary);
+  border-color: var(--uni-border);
+}
+
+/* ── Medallion ring ── */
+.uni-medallion-ring {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.uni-medallion-ring-outer {
+  position: absolute;
+  inset: 0.1875rem;
+  border: 2px solid currentColor;
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.uni-medallion-ring-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.0625rem;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid rgba(255, 45, 85, 0.45);
+  background: rgba(10, 6, 8, 0.72);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.uni-medallion-ring-label {
+  font-size: 0.4375rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  opacity: 0.88;
+}
+
+.uni-badge-medallion-bronze .uni-medallion-ring-inner,
+.uni-badge-medallion-silver .uni-medallion-ring-inner,
+.uni-badge-medallion-gold .uni-medallion-ring-inner,
+.uni-badge-medallion-platinum .uni-medallion-ring-inner {
+  color: #ffd0da;
+}
+
+.uni-badge-card-ready .uni-badge-medallion .uni-medallion-ring-outer {
+  box-shadow: 0 0 10px currentColor;
 }

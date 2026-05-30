@@ -9,7 +9,10 @@
     "lint": "eslint",
     "brand": "node scripts/generate-brand-assets.mjs",
     "compile": "forge build",
-    "test:contracts": "forge test"
+    "test:contracts": "forge test",
+    "deploy:sepolia": "bash scripts/deploy-contracts.sh base_sepolia",
+    "deploy:base": "bash scripts/deploy-contracts.sh base",
+    "verify:base": "bash scripts/verify-base.sh"
   },
   "dependencies": {
     "@base-org/account": "^2.5.6",
