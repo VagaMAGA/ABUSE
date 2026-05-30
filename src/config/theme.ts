@@ -1,0 +1,21 @@
+/** Blood Void — dark red / blood palette */
+export const theme = {
+  primary: "#FF2D55",
+  primaryHover: "#FF5070",
+  primaryPressed: "#D91E45",
+  secondary: "#FF6B35",
+  primaryDeep: "#801825",
+  background: "#0A0608",
+  backgroundElevated: "#120A0D",
+  surface1: "#1A0E12",
+  surface2: "#221018",
+  textPrimary: "#F5E8EA",
+  textSecondary: "rgba(245, 232, 234, 0.78)",
+  textTertiary: "rgba(245, 232, 234, 0.52)",
+  border: "rgba(255, 45, 85, 0.1)",
+  success: "#FF6B35",
+  error: "#FF5F52",
+  radiusSm: 0,
+  radiusLg: 0,
+  radiusXl: 0,
+} as const;

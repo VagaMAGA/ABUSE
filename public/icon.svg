@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="ABUSE">
+  <defs>
+    <linearGradient id="blood" x1="96" y1="64" x2="416" y2="448" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ff2d55"/>
+      <stop offset="52%" stop-color="#ff6b35"/>
+      <stop offset="100%" stop-color="#ff5070"/>
+    </linearGradient>
+    <radialGradient id="void" cx="50%" cy="38%" r="62%">
+      <stop offset="0%" stop-color="#ff2d55" stop-opacity="0.2"/>
+      <stop offset="55%" stop-color="#ff6b35" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#0a0608" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="512" height="512" fill="#0a0608"/>
+  <rect width="512" height="512" fill="url(#void)"/>
+  <rect x="24" y="24" width="464" height="464" fill="none" stroke="#ff2d55" stroke-width="10"/>
+  <rect x="44" y="44" width="424" height="424" fill="#120a0d" stroke="#801825" stroke-width="4"/>
+
+  <g filter="url(#glow)">
+    <path
+      fill="url(#blood)"
+      fill-rule="evenodd"
+      d="
+        M 256 108
+        L 372 404
+        H 318
+        L 292 332
+        H 220
+        L 194 404
+        H 140
+        L 256 108
+        Z
+        M 238 284
+        H 274
+        L 256 228
+        Z
+      "
+    />
+  </g>
+
+  <rect x="108" y="428" width="296" height="8" fill="#ff2d55"/>
+</svg>

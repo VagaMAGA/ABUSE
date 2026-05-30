@@ -1,0 +1,20 @@
+{
+  "id": "abuse",
+  "name": "ABUSE",
+  "short_name": "ABUSE",
+  "description": "ABUSE — Base mini app",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0608",
+  "theme_color": "#ff2d55",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

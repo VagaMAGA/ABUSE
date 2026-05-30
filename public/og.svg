@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 628" role="img" aria-label="ABUSE">
+  <defs>
+    <linearGradient id="blood" x1="0" y1="0" x2="1200" y2="628" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ff2d55"/>
+      <stop offset="50%" stop-color="#ff6b35"/>
+      <stop offset="100%" stop-color="#ff5070"/>
+    </linearGradient>
+    <radialGradient id="void" cx="18%" cy="42%" r="55%">
+      <stop offset="0%" stop-color="#ff2d55" stop-opacity="0.24"/>
+      <stop offset="100%" stop-color="#0a0608" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="628" fill="#0a0608"/>
+  <rect width="1200" height="628" fill="url(#void)"/>
+  <rect x="32" y="32" width="1136" height="564" fill="none" stroke="#ff2d55" stroke-width="6"/>
+
+  <g transform="translate(120 114)">
+    <rect width="400" height="400" fill="#120a0d" stroke="#801825" stroke-width="4"/>
+    <path
+      fill="url(#blood)"
+      fill-rule="evenodd"
+      d="
+        M 200 72
+        L 318 328
+        H 264
+        L 238 256
+        H 162
+        L 136 328
+        H 82
+        L 200 72
+        Z
+        M 182 224
+        H 218
+        L 200 168
+        Z
+      "
+    />
+    <rect x="56" y="352" width="288" height="8" fill="#ff2d55"/>
+  </g>
+
+  <text
+    x="620"
+    y="290"
+    fill="#f5e8ea"
+    font-family="system-ui, -apple-system, Segoe UI, sans-serif"
+    font-size="112"
+    font-weight="700"
+    letter-spacing="8"
+  >
+    ABUSE
+  </text>
+  <text
+    x="624"
+    y="360"
+    fill="#ff5070"
+    font-family="system-ui, -apple-system, Segoe UI, sans-serif"
+    font-size="34"
+    font-weight="500"
+    letter-spacing="6"
+  >
+    BASE MINI APP
+  </text>
+  <rect x="620" y="392" width="420" height="6" fill="#ff2d55"/>
+</svg>
