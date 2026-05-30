@@ -1,13 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { formatUnits } from "viem";
 import Link from "next/link";
+import { useMemo, useState } from "react";
 import { useAccount, useChainId, useSwitchChain } from "wagmi";
 
 import { AppNav } from "@/components/AppNav";
 import { BadgeCard } from "@/components/BadgeCard";
 import { ConnectWallet } from "@/components/ConnectWallet";
 import { PreviewBanner } from "@/components/PreviewBanner";
+import { TOKEN_SYMBOL } from "@/config/app";
 import type { BadgeDefinition, BadgeKind } from "@/config/badges";
 import { BADGES } from "@/config/badges";
 import { DEPLOY_CHAIN_ID } from "@/config/contract";
@@ -30,7 +32,7 @@ const TABS: { id: BadgeTab; label: string }[] = [
   { id: "all", label: "All" },
   { id: "gm", label: "GM" },
   { id: "deploy", label: "Deploy" },
-  { id: "points", label: "Points" },
+  { id: "token", label: TOKEN_SYMBOL },
   { id: "rank", label: "Rank" },
   { id: "collection", label: "Collection" },
   { id: "referral", label: "Referral" },
@@ -39,7 +41,7 @@ const TABS: { id: BadgeTab; label: string }[] = [
 const SECTION_LABELS: Record<BadgeKind, string> = {
   gm: "GM milestones",
   deploy: "Deploy milestones",
-  points: "Points milestones",
+  token: "$A claimed",
   rank: "Leaderboard rank",
   collection: "Badge collection",
   referral: "Referral milestones",
@@ -90,7 +92,7 @@ export function BadgesApp() {
   const { switchChain, isPending: isSwitching } = useSwitchChain();
   const wrongChain = isConnected && chainId !== DEPLOY_CHAIN_ID;
 
-  const { gmCount, deployCount, points, referralCount } = useHubStats();
+  const { gmCount, deployCount, airdropClaimed, referralCount } = useHubStats();
   const {
     badges: liveBadges,
     refresh,
@@ -121,7 +123,7 @@ export function BadgesApp() {
     const kinds: BadgeKind[] = [
       "gm",
       "deploy",
-      "points",
+      "token",
       "rank",
       "collection",
       "referral",
@@ -141,8 +143,8 @@ export function BadgesApp() {
           return "12";
         case "deploy":
           return "4";
-        case "points":
-          return "420";
+        case "token":
+          return "1000";
         case "rank":
           return "#42";
         case "collection":
@@ -157,8 +159,10 @@ export function BadgesApp() {
         return gmCount?.toString() ?? "0";
       case "deploy":
         return deployCount?.toString() ?? "0";
-      case "points":
-        return points?.toString() ?? "0";
+      case "token":
+        return airdropClaimed != null
+          ? formatUnits(airdropClaimed, 18)
+          : "0";
       case "rank":
         return userRank != null ? `#${userRank}` : "—";
       case "collection":
@@ -180,8 +184,9 @@ export function BadgesApp() {
           <p className="uni-eyebrow text-center">Collectible NFTs · Base</p>
           <h1 className="uni-title mt-2 text-center text-3xl">Badge collection</h1>
           <p className="uni-body mx-auto mt-2 max-w-sm text-center text-sm">
-            Earn milestone badges for GM, deploys, points, leaderboard rank, and
-            your badge collection. Mint each one once as an on-chain NFT.
+            Earn milestone badges for GM, deploys, {TOKEN_SYMBOL} claimed,
+            leaderboard rank, and your badge collection. Mint each one once as
+            an on-chain NFT.
           </p>
 
           <div className="uni-badges-collection">
@@ -227,9 +232,9 @@ export function BadgesApp() {
               </p>
             </div>
             <div className="uni-badges-stat">
-              <p className="uni-label">Points</p>
+              <p className="uni-label">{TOKEN_SYMBOL} claimed</p>
               <p className="uni-badges-stat-value uni-mono mt-0.5 uni-text-accent">
-                {statForKind("points")}
+                {statForKind("token")}
               </p>
             </div>
             <div className="uni-badges-stat">
@@ -295,8 +300,8 @@ export function BadgesApp() {
                         ? gmCount
                         : badge.kind === "deploy"
                           ? deployCount
-                          : badge.kind === "points"
-                            ? points
+                          : badge.kind === "token"
+                            ? airdropClaimed
                             : badge.kind === "referral"
                               ? referralCount
                               : undefined

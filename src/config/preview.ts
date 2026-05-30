@@ -49,8 +49,20 @@ export function isAirdropLiveMode(opts: {
   return isHubLiveMode(opts) && opts.airdropConfigured;
 }
 
-export const PREVIEW_A_CLAIMED = "12.4";
-export const PREVIEW_CLAIM_POINTS = 600;
+export function isStakingLiveMode(opts: {
+  isConnected: boolean;
+  wrongChain: boolean;
+  stakingConfigured: boolean;
+}): boolean {
+  return isHubLiveMode(opts) && opts.stakingConfigured;
+}
+
+export const PREVIEW_A_CLAIMED = "240";
+export const PREVIEW_CLAIM_POINTS = 1000;
+export const PREVIEW_STAKED_A = "500";
+export const PREVIEW_STAKING_EARNED = "12.4";
+export const PREVIEW_STAKING_WALLET = "740";
+export const PREVIEW_TOTAL_STAKED = "12,400";
 
 export const PREVIEW_REFERRALS: ReferralRedemption[] = [
   {
@@ -122,10 +134,10 @@ export const PREVIEW_DAILY_ITEMS: FarmCheckItem[] = [
   {
     id: "daily-boost",
     title: "Activate Boost",
-    description: "Free once per day · ~1h of 2× points",
+    description: "Free once per day · tap Boost on Farm rank",
     done: true,
     pointsLabel: "2× all",
-    href: "/?tab=boost",
+    href: "/",
   },
   {
     id: "daily-gm",
@@ -133,7 +145,7 @@ export const PREVIEW_DAILY_ITEMS: FarmCheckItem[] = [
     description: `2/${DAILY_FREE_GM_TARGET} free GMs used today · resets UTC midnight`,
     done: false,
     pointsLabel: "2× with Boost",
-    href: "/",
+    href: "/?section=play&tab=gm",
   },
   {
     id: "daily-deploy",
@@ -141,7 +153,7 @@ export const PREVIEW_DAILY_ITEMS: FarmCheckItem[] = [
     description: "One free token deploy per day on Base",
     done: true,
     pointsLabel: "2× with Boost",
-    href: "/?tab=deploy",
+    href: "/?section=play&tab=deploy",
   },
 ];
 

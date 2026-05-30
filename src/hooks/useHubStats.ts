@@ -103,6 +103,13 @@ export function useHubStats() {
       {
         address: HUB_CONTRACT_ADDRESS,
         abi: hubAbi,
+        functionName: "airdropClaimed" as const,
+        args: [address] as const,
+        chainId: DEPLOY_CHAIN_ID,
+      },
+      {
+        address: HUB_CONTRACT_ADDRESS,
+        abi: hubAbi,
         functionName: "boostActiveUntil" as const,
         args: [address] as const,
         chainId: DEPLOY_CHAIN_ID,
@@ -202,10 +209,21 @@ export function useHubStats() {
     },
   });
 
-  const boostActiveUntil = data?.[12]?.result as bigint | undefined;
-  const freeBoostAvailable = data?.[13]?.result as boolean | undefined;
-  const boostCount = data?.[14]?.result as bigint | undefined;
-  const boostFeeOnChain = data?.[15]?.result as bigint | undefined;
+  useWatchContractEvent({
+    address: HUB_CONTRACT_ADDRESS,
+    abi: hubAbi,
+    eventName: "AirdropClaimed",
+    chainId: DEPLOY_CHAIN_ID,
+    enabled,
+    onLogs(logs) {
+      if (logs.some((log) => onMine(log.args.user))) void refetch();
+    },
+  });
+
+  const boostActiveUntil = data?.[13]?.result as bigint | undefined;
+  const freeBoostAvailable = data?.[14]?.result as boolean | undefined;
+  const boostCount = data?.[15]?.result as bigint | undefined;
+  const boostFeeOnChain = data?.[16]?.result as bigint | undefined;
 
   const boostActive =
     boostActiveUntil != null &&
@@ -224,6 +242,7 @@ export function useHubStats() {
     deployFeeOnChain: data?.[9]?.result as bigint | undefined,
     minInterval: data?.[10]?.result as bigint | undefined,
     referralCount: data?.[11]?.result as bigint | undefined,
+    airdropClaimed: data?.[12]?.result as bigint | undefined,
     boostActiveUntil,
     freeBoostAvailable,
     boostCount,

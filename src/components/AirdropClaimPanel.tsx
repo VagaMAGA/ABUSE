@@ -2,12 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useAccount, useChainId, useSwitchChain } from "wagmi";
 
-import { AppNav } from "@/components/AppNav";
-import { ConnectWallet } from "@/components/ConnectWallet";
-import { PreviewBanner } from "@/components/PreviewBanner";
-import { APP_NAME, TOKEN_SYMBOL } from "@/config/app";
+import { TOKEN_SYMBOL } from "@/config/app";
 import {
   AIRDROP_MIN_POINTS,
   POINTS_PER_A_TOKEN,
@@ -16,10 +12,7 @@ import {
   claimProgressPercent,
   pointsUntilClaim,
 } from "@/config/airdrop";
-import { DEPLOY_CHAIN_ID } from "@/config/contract";
 import {
-  isAirdropLiveMode,
-  isHubLiveMode,
   PREVIEW_A_CLAIMED,
   PREVIEW_CLAIM_POINTS,
   PREVIEW_POINTS,
@@ -27,16 +20,18 @@ import {
 import { useAirdrop } from "@/hooks/useAirdrop";
 import { useHubStats } from "@/hooks/useHubStats";
 
-export function AirdropApp() {
-  const { isConnected } = useAccount();
-  const chainId = useChainId();
-  const { switchChain, isPending: isSwitching } = useSwitchChain();
-  const wrongChain = isConnected && chainId !== DEPLOY_CHAIN_ID;
+type AirdropClaimPanelProps = {
+  isLiveMode: boolean;
+  onSuccess?: () => void;
+};
 
+export function AirdropClaimPanel({
+  isLiveMode,
+  onSuccess,
+}: AirdropClaimPanelProps) {
   const { points: livePoints, refreshStats } = useHubStats();
   const {
     points: hookPoints,
-    airdropConfigured,
     tokenBalance,
     totalClaimed,
     claim,
@@ -47,13 +42,6 @@ export function AirdropApp() {
     writeError,
     reset,
   } = useAirdrop();
-
-  const isLiveMode = isAirdropLiveMode({
-    isConnected,
-    wrongChain,
-    airdropConfigured,
-  });
-  const hubLive = isHubLiveMode({ isConnected, wrongChain });
 
   const userPoints = isLiveMode
     ? (hookPoints ?? livePoints ?? BigInt(0))
@@ -82,8 +70,9 @@ export function AirdropApp() {
       void refresh();
       void refreshStats();
       reset();
+      onSuccess?.();
     }
-  }, [isSuccess, refresh, refreshStats, reset]);
+  }, [isSuccess, refresh, refreshStats, reset, onSuccess]);
 
   const receiveAmount = useMemo(
     () => aTokensForPoints(spendPoints),
@@ -94,40 +83,6 @@ export function AirdropApp() {
 
   return (
     <>
-      <AppNav />
-
-      <header className="uni-card px-5 py-5 text-center">
-        <p className="uni-eyebrow">Points → token · Base</p>
-        <h1 className="uni-title mt-2 text-3xl">Airdrop</h1>
-        <p className="uni-body mx-auto mt-2 max-w-sm text-sm">
-          Earn Hub points from GM, deploy, and referrals — then redeem for{" "}
-          <span className="uni-text-accent font-semibold">{TOKEN_SYMBOL}</span>{" "}
-          on-chain.
-        </p>
-        <p className="uni-caption mt-3 text-center">
-          <Link href="/" className="uni-link">
-            ← {APP_NAME} App
-          </Link>
-        </p>
-      </header>
-
-      {!hubLive && <PreviewBanner />}
-
-      <div className="uni-card px-4 py-5">
-        <ConnectWallet />
-      </div>
-
-      {wrongChain && hubLive && (
-        <button
-          type="button"
-          className="uni-btn uni-btn-primary"
-          disabled={isSwitching}
-          onClick={() => switchChain({ chainId: DEPLOY_CHAIN_ID })}
-        >
-          {isSwitching ? "Switching…" : "Switch to Base"}
-        </button>
-      )}
-
       <div className="uni-card px-4 py-4">
         <div className="flex items-center justify-between gap-2">
           <p className="uni-label">Your points</p>
@@ -181,7 +136,7 @@ export function AirdropApp() {
       <div className="uni-card px-4 py-4">
         <p className="uni-label">Redeem points</p>
         <p className="uni-caption mt-1">
-          Rate: {POINTS_PER_A_TOKEN} pts = 1 {TOKEN_SYMBOL}
+          Rate: 1 pt = 1 {TOKEN_SYMBOL} (1000 pts = 1000 {TOKEN_SYMBOL})
         </p>
 
         <label className="mt-4 block">
@@ -239,38 +194,14 @@ export function AirdropApp() {
         )}
       </div>
 
-      <div className="uni-card-inset px-4 py-3">
-        <p className="uni-label">How it works</p>
-        <ol className="uni-caption mt-2 list-decimal space-y-1 pl-4">
-          <li>Farm points on App, Farm, and Refer tabs.</li>
-          <li>
-            Reach {AIRDROP_MIN_POINTS}+ points to unlock redemption.
-          </li>
-          <li>
-            Choose how many points to burn — receive {TOKEN_SYMBOL} instantly.
-          </li>
-          <li>Remaining points stay on your Hub balance for badges & rank.</li>
-        </ol>
-      </div>
-
       {!isLiveMode && (
         <p className="uni-caption text-center">
           Demo: {PREVIEW_CLAIM_POINTS} pts would claim{" "}
           {aTokensForPoints(PREVIEW_CLAIM_POINTS).toFixed(1)} {TOKEN_SYMBOL}.{" "}
-          <Link href="/farm" className="uni-link">
+          <Link href="/?section=play&tab=gm" className="uni-link">
             Farm points →
           </Link>
         </p>
-      )}
-
-      {hubLive && !airdropConfigured && (
-        <div className="uni-card uni-card-critical px-4 py-4">
-          <p className="uni-caption">
-            Deploy <span className="uni-code">AbuseToken.sol</span>, call{" "}
-            <span className="uni-code">setAirdropToken</span> on Hub, and set{" "}
-            <span className="uni-code">ABUSE_TOKEN_ADDRESS</span> in config.
-          </p>
-        </div>
       )}
     </>
   );

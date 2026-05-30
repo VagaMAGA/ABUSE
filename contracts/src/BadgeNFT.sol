@@ -6,6 +6,7 @@ interface IHubReader {
     function deployCount(address user) external view returns (uint256);
     function points(address user) external view returns (uint256);
     function referralCount(address user) external view returns (uint256);
+    function airdropClaimed(address user) external view returns (uint256);
 }
 
 /// @title BadgeNFT — milestone badges (GM, deploy, points, leaderboard rank)
@@ -15,7 +16,7 @@ contract BadgeNFT {
 
     uint8 internal constant CAT_GM = 1;
     uint8 internal constant CAT_DEPLOY = 2;
-    uint8 internal constant CAT_POINTS = 3;
+    uint8 internal constant CAT_TOKEN = 3;
     uint8 internal constant CAT_RANK = 4;
     uint8 internal constant CAT_COLLECTION = 5;
     uint8 internal constant CAT_REFERRAL = 6;
@@ -33,7 +34,7 @@ contract BadgeNFT {
     mapping(uint256 => uint256) public tokenBadgeType;
     mapping(address => mapping(uint256 badgeType => bool)) public hasMintedType;
 
-  /// badgeType 1–3 GM · 4–6 Deploy · 7–9 Points · 10–12 Rank
+  /// badgeType 1–3 GM · 4–6 Deploy · 7–9 $A claimed · 10–12 Rank
   /// 13–15 Platinum GM/Deploy/Points · 16 Rank top 3 · 17–20 Collection
   /// 21–24 Referral (2 / 5 / 10 / 20 friends)
     mapping(uint256 => uint8) public badgeCategory;
@@ -71,15 +72,15 @@ contract BadgeNFT {
         _setBadge(4, CAT_DEPLOY, 10);
         _setBadge(5, CAT_DEPLOY, 20);
         _setBadge(6, CAT_DEPLOY, 50);
-        _setBadge(7, CAT_POINTS, 100);
-        _setBadge(8, CAT_POINTS, 500);
-        _setBadge(9, CAT_POINTS, 1000);
+        _setBadge(7, CAT_TOKEN, 500);
+        _setBadge(8, CAT_TOKEN, 1000);
+        _setBadge(9, CAT_TOKEN, 5000);
         _setBadge(10, CAT_RANK, 10);
         _setBadge(11, CAT_RANK, 50);
         _setBadge(12, CAT_RANK, 100);
         _setBadge(13, CAT_GM, 100);
         _setBadge(14, CAT_DEPLOY, 100);
-        _setBadge(15, CAT_POINTS, 5000);
+        _setBadge(15, CAT_TOKEN, 10000);
         _setBadge(16, CAT_RANK, 3);
         _setBadge(17, CAT_COLLECTION, 4);
         _setBadge(18, CAT_COLLECTION, 8);
@@ -123,8 +124,8 @@ contract BadgeNFT {
         if (category == CAT_DEPLOY) {
             return hub.deployCount(user) >= threshold;
         }
-        if (category == CAT_POINTS) {
-            return hub.points(user) >= threshold;
+        if (category == CAT_TOKEN) {
+            return hub.airdropClaimed(user) >= threshold * 1e18;
         }
         if (category == CAT_COLLECTION) {
             return _milestoneMintedCount(user) >= threshold;
@@ -228,10 +229,10 @@ contract BadgeNFT {
                 )
             );
         }
-        if (category == CAT_POINTS) {
+        if (category == CAT_TOKEN) {
             return string(
                 abi.encodePacked(
-                    "tinyBig Badge: Points ",
+                    "tinyBig Badge: $A ",
                     _uintToString(threshold)
                 )
             );

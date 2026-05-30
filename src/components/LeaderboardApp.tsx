@@ -101,7 +101,7 @@ export function LeaderboardApp() {
         <ConnectWallet />
       </div>
 
-      {wrongChain && isLiveMode && (
+      {wrongChain && (
         <button
           type="button"
           className="uni-btn uni-btn-primary"

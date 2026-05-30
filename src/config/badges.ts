@@ -1,7 +1,7 @@
 export type BadgeKind =
   | "gm"
   | "deploy"
-  | "points"
+  | "token"
   | "rank"
   | "collection"
   | "referral";
@@ -71,26 +71,26 @@ export const BADGES: readonly BadgeDefinition[] = [
   },
   {
     id: 7,
-    kind: "points",
-    threshold: 100,
-    title: "Points ×100",
-    description: "Earn 100 total points in the app",
+    kind: "token",
+    threshold: 500,
+    title: "$A ×500",
+    description: "Claim 500 total $A from the airdrop",
     mintMode: "hub",
   },
   {
     id: 8,
-    kind: "points",
-    threshold: 500,
-    title: "Points ×500",
-    description: "Earn 500 total points in the app",
+    kind: "token",
+    threshold: 1000,
+    title: "$A ×1000",
+    description: "Claim 1000 total $A from the airdrop",
     mintMode: "hub",
   },
   {
     id: 9,
-    kind: "points",
-    threshold: 1000,
-    title: "Points ×1000",
-    description: "Earn 1000 total points in the app",
+    kind: "token",
+    threshold: 5000,
+    title: "$A ×5000",
+    description: "Claim 5000 total $A from the airdrop",
     mintMode: "hub",
   },
   {
@@ -135,10 +135,10 @@ export const BADGES: readonly BadgeDefinition[] = [
   },
   {
     id: 15,
-    kind: "points",
-    threshold: 5000,
-    title: "Points ×5000",
-    description: "Earn 5000 total points in the app",
+    kind: "token",
+    threshold: 10000,
+    title: "$A ×10000",
+    description: "Claim 10000 total $A from the airdrop",
     mintMode: "hub",
   },
   {
@@ -226,7 +226,7 @@ export const MILESTONE_BADGE_COUNT = MILESTONE_BADGE_MAX;
 
 export const GM_BADGES = BADGES.filter((b) => b.kind === "gm");
 export const DEPLOY_BADGES = BADGES.filter((b) => b.kind === "deploy");
-export const POINTS_BADGES = BADGES.filter((b) => b.kind === "points");
+export const TOKEN_BADGES = BADGES.filter((b) => b.kind === "token");
 export const RANK_BADGES = BADGES.filter((b) => b.kind === "rank");
 export const COLLECTION_BADGES = BADGES.filter((b) => b.kind === "collection");
 export const REFERRAL_BADGES = BADGES.filter((b) => b.kind === "referral");

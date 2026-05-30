@@ -4,6 +4,7 @@ pragma solidity ^0.8.24;
 import {Test} from "forge-std/Test.sol";
 import {Hub} from "../src/Hub.sol";
 import {BadgeNFT} from "../src/BadgeNFT.sol";
+import {AbuseToken} from "../src/AbuseToken.sol";
 
 /// @dev Verifies all 24 badge types: config, eligibility paths, and mint flows.
 contract BadgeNFTAllTest is Test {
@@ -17,7 +18,7 @@ contract BadgeNFTAllTest is Test {
 
     uint8 internal constant CAT_GM = 1;
     uint8 internal constant CAT_DEPLOY = 2;
-    uint8 internal constant CAT_POINTS = 3;
+    uint8 internal constant CAT_TOKEN = 3;
     uint8 internal constant CAT_RANK = 4;
     uint8 internal constant CAT_COLLECTION = 5;
     uint8 internal constant CAT_REFERRAL = 6;
@@ -38,15 +39,15 @@ contract BadgeNFTAllTest is Test {
         _assertBadge(4, CAT_DEPLOY, 10);
         _assertBadge(5, CAT_DEPLOY, 20);
         _assertBadge(6, CAT_DEPLOY, 50);
-        _assertBadge(7, CAT_POINTS, 100);
-        _assertBadge(8, CAT_POINTS, 500);
-        _assertBadge(9, CAT_POINTS, 1000);
+        _assertBadge(7, CAT_TOKEN, 500);
+        _assertBadge(8, CAT_TOKEN, 1000);
+        _assertBadge(9, CAT_TOKEN, 5000);
         _assertBadge(10, CAT_RANK, 10);
         _assertBadge(11, CAT_RANK, 50);
         _assertBadge(12, CAT_RANK, 100);
         _assertBadge(13, CAT_GM, 100);
         _assertBadge(14, CAT_DEPLOY, 100);
-        _assertBadge(15, CAT_POINTS, 5000);
+        _assertBadge(15, CAT_TOKEN, 10000);
         _assertBadge(16, CAT_RANK, 3);
         _assertBadge(17, CAT_COLLECTION, 4);
         _assertBadge(18, CAT_COLLECTION, 8);
@@ -56,6 +57,54 @@ contract BadgeNFTAllTest is Test {
         _assertBadge(22, CAT_REFERRAL, 5);
         _assertBadge(23, CAT_REFERRAL, 10);
         _assertBadge(24, CAT_REFERRAL, 20);
+    }
+
+    function test_mintTokenBadge_usesLifetimeClaimed() public {
+        AbuseToken token = new AbuseToken(address(hub), 1_000_000 ether);
+        hub.setAirdropToken(address(token));
+
+        while (hub.points(alice) < 1000) {
+            if (hub.freeGmsRemaining(alice) == 0) {
+                vm.startBroadcast(aliceKey);
+                hub.gm{value: hub.GM_FEE()}();
+                vm.stopBroadcast();
+            } else {
+                vm.prank(alice);
+                hub.gm();
+            }
+            vm.warp(block.timestamp + hub.MIN_INTERVAL());
+        }
+
+        vm.prank(alice);
+        hub.claimAirdrop(1000);
+
+        assertEq(hub.airdropClaimed(alice), 1000 ether);
+        assertTrue(badges.eligibility(alice, 7));
+        vm.prank(alice);
+        badges.mint(7);
+        assertTrue(badges.hasMintedType(alice, 7));
+    }
+
+    function test_tokenBadge_staysEligibleAfterPointsSpent() public {
+        AbuseToken token = new AbuseToken(address(hub), 1_000_000 ether);
+        hub.setAirdropToken(address(token));
+
+        while (hub.points(alice) < 1100) {
+            if (hub.freeGmsRemaining(alice) == 0) {
+                vm.startBroadcast(aliceKey);
+                hub.gm{value: hub.GM_FEE()}();
+                vm.stopBroadcast();
+            } else {
+                vm.prank(alice);
+                hub.gm();
+            }
+            vm.warp(block.timestamp + hub.MIN_INTERVAL());
+        }
+
+        vm.prank(alice);
+        hub.claimAirdrop(1000);
+        assertEq(hub.airdropClaimed(alice), 1000 ether);
+        assertTrue(badges.eligibility(alice, 8));
     }
 
     function test_mintDeployBadge() public {

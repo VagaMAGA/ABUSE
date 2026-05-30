@@ -1,8 +1,8 @@
 /** Airdrop redemption — must match Hub.sol constants */
-export const AIRDROP_MIN_POINTS = 500;
-export const POINTS_PER_A_TOKEN = 100;
+export const AIRDROP_MIN_POINTS = 1000;
+export const POINTS_PER_A_TOKEN = 1;
 
-/** $A tokens per point spent (display: 100 pts → 1 $A) */
+/** $A tokens per point spent (1 pt → 1 $A) */
 export function aTokensForPoints(points: number | bigint): number {
   const pts = Number(points);
   if (!Number.isFinite(pts) || pts <= 0) return 0;

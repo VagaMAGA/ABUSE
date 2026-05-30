@@ -9,7 +9,7 @@ type AirdropOrbLinkProps = {
 export function AirdropOrbLink({ className = "", size = 52 }: AirdropOrbLinkProps) {
   return (
     <Link
-      href="/airdrop"
+      href="/stake?tab=claim"
       className={`uni-airdrop-entry ${className}`.trim()}
       aria-label="Claim airdrop"
     >

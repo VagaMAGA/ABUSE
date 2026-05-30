@@ -2,15 +2,10 @@
 
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
-import { useChainId, useSwitchChain } from "wagmi";
 
+import { FarmBoostButton } from "@/components/FarmBoostButton";
 import { TOKEN_SYMBOL } from "@/config/app";
-import { AppNav } from "@/components/AppNav";
-import { ConnectWallet } from "@/components/ConnectWallet";
-import { PreviewBanner } from "@/components/PreviewBanner";
-import { DEPLOY_CHAIN_ID } from "@/config/contract";
 import {
-  isHubLiveMode,
   PREVIEW_CODE,
   PREVIEW_DAILY_DONE,
   PREVIEW_DAILY_ITEMS,
@@ -35,17 +30,75 @@ import { useFarmProgress } from "@/hooks/useFarmProgress";
 import { useFarcasterMiniApp } from "@/hooks/useFarcasterMiniApp";
 import { shareOnFarcaster, shareOnX } from "@/lib/shareReferral";
 
-type Tab = "today" | "setup" | "calc";
+export type FarmTab = "today" | "setup" | "calc";
 
-export function FarmApp() {
-  const [tab, setTab] = useState<Tab>("today");
+type FarmProgressSectionProps = {
+  isLiveMode: boolean;
+  showFarm: boolean;
+  tab: FarmTab;
+  onTabChange: (tab: FarmTab) => void;
+};
+
+export function FarmRankCard({
+  pointsNum,
+  isLiveMode,
+  boostDisabled,
+  boostPreview,
+  onBoostSuccess,
+}: {
+  pointsNum: number;
+  isLiveMode: boolean;
+  boostDisabled?: boolean;
+  boostPreview?: boolean;
+  onBoostSuccess?: () => void;
+}) {
+  const rank = farmRankForPoints(pointsNum);
+  const nextRank = nextFarmRank(pointsNum);
+  const ringPct = rankProgressPercent(pointsNum);
+
+  return (
+    <div className="uni-card flex items-center gap-3 px-4 py-4">
+      <FarmRing percent={ringPct} />
+      <div className="min-w-0 flex-1">
+        <p className="uni-label">Farm rank</p>
+        <p className="uni-title text-2xl">{rank.label}</p>
+        <p className="uni-mono mt-1 text-lg font-semibold text-[var(--uni-pink)]">
+          {pointsNum.toLocaleString()} pts
+          {!isLiveMode && (
+            <span className="ml-1 text-xs font-normal text-[var(--uni-text-tertiary)]">
+              demo
+            </span>
+          )}
+        </p>
+        {nextRank ? (
+          <p className="uni-caption mt-1">
+            {ringPct}% to {nextRank.label} ({nextRank.minPoints} pts)
+          </p>
+        ) : (
+          <p className="uni-caption mt-1 text-[var(--uni-success)]">
+            Max rank — keep farming
+          </p>
+        )}
+      </div>
+      <FarmBoostButton
+        disabled={boostDisabled}
+        preview={boostPreview}
+        onSuccess={onBoostSuccess}
+      />
+    </div>
+  );
+}
+
+export function FarmProgressSection({
+  isLiveMode,
+  showFarm,
+  tab,
+  onTabChange,
+}: FarmProgressSectionProps) {
   const [friendSlider, setFriendSlider] = useState(3);
-  const chainId = useChainId();
-  const { switchChain, isPending: isSwitching } = useSwitchChain();
   const { inMiniApp } = useFarcasterMiniApp();
 
   const {
-    isConnected,
     pointsNum: livePointsNum,
     gmCount: liveGmCount,
     myCode: liveMyCode,
@@ -58,10 +111,6 @@ export function FarmApp() {
     markShared,
   } = useFarmProgress();
 
-  const wrongChain = isConnected && chainId !== DEPLOY_CHAIN_ID;
-  const isLiveMode = isHubLiveMode({ isConnected, wrongChain });
-  const showFarm = isLiveMode ? isConnected && !wrongChain : true;
-
   const pointsNum = isLiveMode ? livePointsNum : PREVIEW_FARM_POINTS;
   const gmCount = isLiveMode ? liveGmCount : PREVIEW_FARM_GM;
   const myCode = isLiveMode ? liveMyCode : PREVIEW_CODE;
@@ -71,9 +120,7 @@ export function FarmApp() {
   const dailyTotal = isLiveMode ? liveDailyTotal : PREVIEW_DAILY_TOTAL;
   const setupDone = isLiveMode ? liveSetupDone : PREVIEW_SETUP_DONE;
   const setupTotal = isLiveMode ? liveSetupTotal : PREVIEW_SETUP_TOTAL;
-  const rank = farmRankForPoints(pointsNum);
-  const nextRank = nextFarmRank(pointsNum);
-  const ringPct = rankProgressPercent(pointsNum);
+
   const dailyPct =
     dailyTotal > 0 ? Math.round((dailyDone / dailyTotal) * 100) : 0;
 
@@ -97,192 +144,133 @@ export function FarmApp() {
     void shareOnFarcaster(myCode, inMiniApp).then(markShared);
   }, [myCode, inMiniApp, markShared]);
 
+  if (!showFarm) return null;
+
   return (
     <>
-      <AppNav />
+      {nextStep && (
+        <div className="uni-airdrop-callout px-4 py-3">
+          <p className="uni-label">Do this next</p>
+          <p className="uni-airdrop-text mt-1 text-left">
+            <span className="font-semibold">{nextStep.title}</span>
+            {nextStep.pointsLabel ? (
+              <span className="uni-text-accent"> · {nextStep.pointsLabel}</span>
+            ) : null}
+          </p>
+          <Link
+            href={nextStep.href}
+            className="uni-btn uni-btn-primary uni-btn-sm mt-3 inline-flex w-full justify-center"
+          >
+            Go →
+          </Link>
+        </div>
+      )}
 
-      <header className="uni-card px-5 py-5 text-center">
-        <p className="uni-eyebrow">Guide · Base</p>
-        <h1 className="uni-title mt-2 text-3xl">Farm {TOKEN_SYMBOL}</h1>
-        <p className="uni-body mt-2 text-sm">
-          Live checklist tied to your wallet. More points = stronger{" "}
-          <span className="uni-text-accent font-semibold">{TOKEN_SYMBOL}</span> farm story.
-        </p>
-      </header>
-
-      {!isLiveMode && <PreviewBanner />}
-
-      <div className="uni-card px-4 py-5">
-        <ConnectWallet />
+      <div className="uni-card px-2 py-2">
+        <div className="uni-tabs">
+          {(
+            [
+              ["today", "Today"],
+              ["setup", "Setup"],
+              ["calc", "Calculator"],
+            ] as const
+          ).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              className={`uni-tab ${tab === id ? "uni-tab-active" : ""}`}
+              onClick={() => onTabChange(id)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {wrongChain && isLiveMode && (
-        <button
-          type="button"
-          className="uni-btn uni-btn-primary"
-          disabled={isSwitching}
-          onClick={() => switchChain({ chainId: DEPLOY_CHAIN_ID })}
-        >
-          {isSwitching ? "Switching…" : "Switch to Base"}
-        </button>
-      )}
-
-      {wrongChain && !isLiveMode && (
-        <button
-          type="button"
-          className="uni-btn uni-btn-primary"
-          disabled={isSwitching}
-          onClick={() => switchChain({ chainId: DEPLOY_CHAIN_ID })}
-        >
-          {isSwitching ? "Switching…" : "Switch to Base (for live play)"}
-        </button>
-      )}
-
-      {showFarm && (
+      {tab === "today" && (
         <>
-          <div className="uni-card flex items-center gap-4 px-4 py-4">
-            <FarmRing percent={ringPct} />
-            <div className="min-w-0 flex-1">
-              <p className="uni-label">Farm rank</p>
-              <p className="uni-title text-2xl">{rank.label}</p>
-              <p className="uni-mono mt-1 text-lg font-semibold text-[var(--uni-pink)]">
-                {pointsNum.toLocaleString()} pts
-                {!isLiveMode && (
-                  <span className="ml-1 text-xs font-normal text-[var(--uni-text-tertiary)]">
-                    demo
-                  </span>
-                )}
-              </p>
-              {nextRank ? (
-                <p className="uni-caption mt-1">
-                  {ringPct}% to {nextRank.label} ({nextRank.minPoints} pts)
-                </p>
-              ) : (
-                <p className="uni-caption mt-1 text-[var(--uni-success)]">
-                  Max rank — keep farming
-                </p>
-              )}
-            </div>
-          </div>
-
-          {nextStep && (
-            <div className="uni-airdrop-callout px-4 py-3">
-              <p className="uni-label">Do this next</p>
-              <p className="uni-airdrop-text mt-1 text-left">
-                <span className="font-semibold">{nextStep.title}</span>
-                {nextStep.pointsLabel ? (
-                  <span className="uni-text-accent"> · {nextStep.pointsLabel}</span>
-                ) : null}
-              </p>
-              <Link
-                href={nextStep.href}
-                className="uni-btn uni-btn-primary uni-btn-sm mt-3 inline-flex w-full justify-center"
-              >
-                Go →
-              </Link>
-            </div>
-          )}
-
-          <div className="uni-tabs">
-            {(
-              [
-                ["today", "Today"],
-                ["setup", "Setup"],
-                ["calc", "Calculator"],
-              ] as const
-            ).map(([id, label]) => (
-              <button
-                key={id}
-                type="button"
-                className={`uni-tab ${tab === id ? "uni-tab-active" : ""}`}
-                onClick={() => setTab(id)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-
-          {tab === "today" && (
-            <>
-              <DailyProgress done={dailyDone} total={dailyTotal} pct={dailyPct} />
-              <Checklist
-                title="Daily acid loop"
-                subtitle={`Up to +${DAILY_FREE_POINTS_MAX} pts/day from free actions`}
-                items={dailyItems}
-              />
-              {dailyPct === 100 && (
-                <p className="uni-caption text-center text-[var(--uni-success)]">
-                  Perfect acid day — come back tomorrow UTC
-                </p>
-              )}
-            </>
-          )}
-
-          {tab === "setup" && (
-            <Checklist
-              title="One-time power moves"
-              subtitle="Biggest boosts for new farmers"
-              items={setupItems}
-              shareCode={myCode ?? undefined}
-              onShareX={myCode ? handleShareX : undefined}
-              onShareFc={myCode ? handleShareFc : undefined}
-              onShareMark={markShared}
-            />
-          )}
-
-          {tab === "calc" && (
-            <div className="flex flex-col gap-3">
-              <div className="uni-card px-4 py-4">
-                <p className="uni-label">Referral simulator</p>
-                <p className="uni-caption mt-1">
-                  Friends who redeem your code: +{POINTS_PER_REFERRAL} pts each
-                  (you)
-                </p>
-                <input
-                  type="range"
-                  min={0}
-                  max={10}
-                  value={friendSlider}
-                  onChange={(e) => setFriendSlider(Number(e.target.value))}
-                  className="mt-4 w-full accent-[var(--uni-pink)]"
-                />
-                <p className="uni-mono mt-2 text-center text-lg font-semibold">
-                  {friendSlider} friends → +{projectedFriends} pts
-                </p>
-              </div>
-
-              <div className="uni-card-inset px-4 py-3">
-                <p className="uni-label">If you also max today</p>
-                <ul className="uni-caption mt-2 space-y-1">
-                  <li>Current: {pointsNum.toLocaleString()} pts</li>
-                  <li>+{projectedDaily} from perfect daily</li>
-                  <li>+{projectedFriends} from referrals above</li>
-                  <li className="uni-text-accent font-semibold">
-                    ≈ {projectedTotal.toLocaleString()} pts total
-                  </li>
-                </ul>
-              </div>
-
-              <p className="uni-caption text-center opacity-80">
-                Points are in-app score for {TOKEN_SYMBOL} narrative — not a token guarantee.
-              </p>
-            </div>
-          )}
-
-          <div className="uni-card-inset px-4 py-3 text-center">
-            <p className="uni-caption">
-              {gmCount} GMs total
-              {myCode ? (
-                <>
-                  {" "}
-                  · code{" "}
-                  <span className="uni-mono uni-text-accent">{myCode}</span>
-                </>
-              ) : null}
+          <DailyProgress done={dailyDone} total={dailyTotal} pct={dailyPct} />
+          <Checklist
+            title="Daily acid loop"
+            subtitle={`Up to +${DAILY_FREE_POINTS_MAX} pts/day from free actions`}
+            items={dailyItems}
+          />
+          {dailyPct === 100 && (
+            <p className="uni-caption text-center text-[var(--uni-success)]">
+              Perfect acid day — come back tomorrow UTC
             </p>
-          </div>
+          )}
         </>
       )}
+
+      {tab === "setup" && (
+        <Checklist
+          title="One-time power moves"
+          subtitle="Biggest boosts for new farmers"
+          items={setupItems}
+          shareCode={myCode ?? undefined}
+          onShareX={myCode ? handleShareX : undefined}
+          onShareFc={myCode ? handleShareFc : undefined}
+          onShareMark={markShared}
+        />
+      )}
+
+      {tab === "calc" && (
+        <div className="flex flex-col gap-3">
+          <div className="uni-card px-4 py-4">
+            <p className="uni-label">Referral simulator</p>
+            <p className="uni-caption mt-1">
+              Friends who redeem your code: +{POINTS_PER_REFERRAL} pts each (you)
+            </p>
+            <input
+              type="range"
+              min={0}
+              max={10}
+              value={friendSlider}
+              onChange={(e) => setFriendSlider(Number(e.target.value))}
+              className="mt-4 w-full accent-[var(--uni-pink)]"
+            />
+            <p className="uni-mono mt-2 text-center text-lg font-semibold">
+              {friendSlider} friends → +{projectedFriends} pts
+            </p>
+          </div>
+
+          <div className="uni-card-inset px-4 py-3">
+            <p className="uni-label">If you also max today</p>
+            <ul className="uni-caption mt-2 space-y-1">
+              <li>Current: {pointsNum.toLocaleString()} pts</li>
+              <li>+{projectedDaily} from perfect daily</li>
+              <li>+{projectedFriends} from referrals above</li>
+              <li className="uni-text-accent font-semibold">
+                ≈ {projectedTotal.toLocaleString()} pts total
+              </li>
+            </ul>
+          </div>
+
+          <p className="uni-caption text-center opacity-80">
+            Points are in-app score for {TOKEN_SYMBOL} narrative — not a token
+            guarantee.
+          </p>
+        </div>
+      )}
+
+      <div className="uni-card-inset px-4 py-3 text-center">
+        <p className="uni-caption">
+          {gmCount} GMs total
+          {myCode ? (
+            <>
+              {" "}
+              · code <span className="uni-mono uni-text-accent">{myCode}</span>
+            </>
+          ) : null}
+          {!isLiveMode && (
+            <span className="text-[var(--uni-text-tertiary)]">
+              {" "}
+              · setup {setupDone}/{setupTotal}
+            </span>
+          )}
+        </p>
+      </div>
     </>
   );
 }

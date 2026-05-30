@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { formatUnits } from "viem";
 import { useAccount, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 
 import {
@@ -131,6 +132,11 @@ export function BadgeCard({
     }
   };
 
+  const progressValue =
+    badge.kind === "token" && currentCount != null
+      ? Number(formatUnits(currentCount, 18))
+      : Number(currentCount ?? 0);
+
   const progress =
     badge.kind === "rank"
       ? userRank != null && userRank <= badge.threshold
@@ -146,9 +152,7 @@ export function BadgeCard({
         : badge.kind === "referral" || currentCount != null
           ? Math.min(
               100,
-              Math.round(
-                (Number(currentCount ?? 0) / badge.threshold) * 100,
-              ),
+              Math.round((progressValue / badge.threshold) * 100),
             )
           : 0;
 
@@ -160,7 +164,9 @@ export function BadgeCard({
       : badge.kind === "collection"
         ? `${milestoneMintedCount} / ${badge.threshold} badges`
         : badge.kind === "referral" || currentCount != null
-          ? `${currentCount ?? 0} / ${badge.threshold}`
+          ? badge.kind === "token"
+            ? `${progressValue.toLocaleString()} / ${badge.threshold}`
+            : `${currentCount ?? 0} / ${badge.threshold}`
           : `0 / ${badge.threshold}`;
 
   const tier = badgeTier(badge);

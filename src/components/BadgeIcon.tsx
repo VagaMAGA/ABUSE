@@ -42,7 +42,7 @@ export function BadgeIcon({ kind, className = "h-6 w-6" }: BadgeIconProps) {
           />
         </svg>
       );
-    case "points":
+    case "token":
       return (
         <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden>
           <path
@@ -97,6 +97,6 @@ export function badgeThresholdLabel(
   if (kind === "rank") return `#${threshold}`;
   if (kind === "collection") return `${threshold} badges`;
   if (kind === "referral") return `${threshold} friends`;
-  if (kind === "points") return `${threshold}`;
+  if (kind === "token") return `${threshold} $A`;
   return `×${threshold}`;
 }

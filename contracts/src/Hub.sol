@@ -29,9 +29,9 @@ contract Hub {
     uint256 public constant BOOST_GM_MULTIPLIER = 2;
 
     /// @dev Minimum points balance required before any $A claim
-    uint256 public constant AIRDROP_MIN_POINTS = 500;
-    /// @dev Whole $A tokens (18 decimals) received per this many points spent
-    uint256 public constant POINTS_PER_A_TOKEN = 100;
+    uint256 public constant AIRDROP_MIN_POINTS = 1000;
+    /// @dev Whole $A tokens (18 decimals) received per this many points spent (1:1 when set to 1)
+    uint256 public constant POINTS_PER_A_TOKEN = 1;
 
     uint256 public totalGms;
     uint256 public totalDeploys;
@@ -213,6 +213,7 @@ contract Hub {
     }
 
     /// @notice Activate 2× GM & deploy points for BOOST_DURATION (1 free per day, then BOOST_FEE).
+    ///         While boost is active, another boost extends the window instead of resetting it.
     function boost() external payable {
         uint256 day = _dayId();
         if (lastBoostDay[msg.sender] != day) {
@@ -230,7 +231,10 @@ contract Hub {
             require(sent, "treasury transfer failed");
         }
 
-        uint256 until = block.timestamp + BOOST_DURATION;
+        uint256 base = boostActiveUntil[msg.sender] > block.timestamp
+            ? boostActiveUntil[msg.sender]
+            : block.timestamp;
+        uint256 until = base + BOOST_DURATION;
         boostActiveUntil[msg.sender] = until;
         boostCount[msg.sender] += 1;
         totalBoosts += 1;

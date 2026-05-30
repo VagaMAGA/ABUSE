@@ -240,6 +240,24 @@ contract HubTest is Test {
         assertTrue(hub.boostActive(alice));
     }
 
+    function test_boost_extendsWhenAlreadyActive() public {
+        vm.prank(alice);
+        hub.boost();
+
+        uint256 firstUntil = hub.boostActiveUntil(alice);
+        assertTrue(firstUntil > block.timestamp);
+
+        vm.warp(block.timestamp + hub.BOOST_DURATION() / 2);
+
+        vm.startBroadcast(aliceKey);
+        hub.boost{value: hub.BOOST_FEE()}();
+        vm.stopBroadcast();
+
+        uint256 extendedUntil = hub.boostActiveUntil(alice);
+        assertEq(extendedUntil, firstUntil + hub.BOOST_DURATION());
+        assertTrue(hub.boostActive(alice));
+    }
+
     function test_gm_doesNotAwardReferralPoints() public {
         address bob = makeAddr("bob");
         vm.deal(bob, 1 ether);
@@ -259,16 +277,16 @@ contract HubTest is Test {
     }
 
     function test_claimAirdrop_burnsPointsAndMintsA() public {
-        _earnPoints(600);
+        _earnPoints(1100);
         uint256 before = hub.points(alice);
 
         vm.prank(alice);
-        hub.claimAirdrop(500);
+        hub.claimAirdrop(1000);
 
-        assertEq(hub.points(alice), before - 500);
-        assertEq(hub.airdropClaimed(alice), hub.previewAirdropTokens(500));
-        assertEq(token.balanceOf(alice), 5 ether);
-        assertEq(token.balanceOf(address(hub)), 1_000_000 ether - 5 ether);
+        assertEq(hub.points(alice), before - 1000);
+        assertEq(hub.airdropClaimed(alice), hub.previewAirdropTokens(1000));
+        assertEq(token.balanceOf(alice), 1000 ether);
+        assertEq(token.balanceOf(address(hub)), 1_000_000 ether - 1000 ether);
     }
 
     function test_revert_claimAirdrop_belowMinimum() public {
@@ -277,7 +295,7 @@ contract HubTest is Test {
 
         vm.prank(alice);
         vm.expectRevert(
-            abi.encodeWithSelector(Hub.AirdropBelowMinimum.selector, 500, 10)
+            abi.encodeWithSelector(Hub.AirdropBelowMinimum.selector, 1000, 10)
         );
         hub.claimAirdrop(10);
     }
@@ -286,6 +304,6 @@ contract HubTest is Test {
         Hub bare = new Hub();
         vm.prank(alice);
         vm.expectRevert(Hub.AirdropNotConfigured.selector);
-        bare.claimAirdrop(500);
+        bare.claimAirdrop(1000);
     }
 }

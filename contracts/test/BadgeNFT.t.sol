@@ -4,6 +4,7 @@ pragma solidity ^0.8.24;
 import {Test} from "forge-std/Test.sol";
 import {Hub} from "../src/Hub.sol";
 import {BadgeNFT} from "../src/BadgeNFT.sol";
+import {AbuseToken} from "../src/AbuseToken.sol";
 
 contract BadgeNFTTest is Test {
     Hub internal hub;
@@ -34,10 +35,26 @@ contract BadgeNFTTest is Test {
         assertEq(badges.balanceOf(alice), 1);
     }
 
-    function test_mintPointsBadge() public {
-        _deployForPoints(alice);
+    function test_mintTokenBadge_afterClaim() public {
+        AbuseToken token = new AbuseToken(address(hub), 1_000_000 ether);
+        hub.setAirdropToken(address(token));
 
-        assertGe(hub.points(alice), 100);
+        while (hub.points(alice) < 1000) {
+            if (hub.freeGmsRemaining(alice) == 0) {
+                vm.startBroadcast(aliceKey);
+                hub.gm{value: hub.GM_FEE()}();
+                vm.stopBroadcast();
+            } else {
+                vm.prank(alice);
+                hub.gm();
+            }
+            vm.warp(block.timestamp + hub.MIN_INTERVAL());
+        }
+
+        vm.prank(alice);
+        hub.claimAirdrop(1000);
+
+        assertEq(hub.airdropClaimed(alice), 1000 ether);
         assertTrue(badges.eligibility(alice, 7));
 
         vm.prank(alice);

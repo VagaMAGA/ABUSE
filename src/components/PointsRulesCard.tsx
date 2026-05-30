@@ -1,4 +1,9 @@
+import Link from "next/link";
+
+import { TOKEN_SYMBOL } from "@/config/app";
+import { AIRDROP_MIN_POINTS } from "@/config/airdrop";
 import { POINTS_RULES } from "@/config/points";
+import { MIN_STAKE_A } from "@/config/staking";
 
 export function PointsRulesCard() {
   return (
@@ -29,6 +34,21 @@ export function PointsRulesCard() {
           <p>Referral Code Redeemed — +{POINTS_RULES.referral} pts each</p>
           <p className="text-[var(--uni-text-tertiary)]">
             ↳ both you and your friend earn rewards
+          </p>
+        </div>
+
+        <div className="space-y-1">
+          <p>
+            Redeem &amp; stake{" "}
+            <span className="uni-text-accent font-semibold">{TOKEN_SYMBOL}</span>{" "}
+            —{" "}
+            <Link href="/stake" className="uni-link">
+              claim &amp; stake
+            </Link>
+          </p>
+          <p className="text-[var(--uni-text-tertiary)]">
+            ↳ claim min {AIRDROP_MIN_POINTS.toLocaleString()} pts · stake min{" "}
+            {MIN_STAKE_A} {TOKEN_SYMBOL}
           </p>
         </div>
       </div>

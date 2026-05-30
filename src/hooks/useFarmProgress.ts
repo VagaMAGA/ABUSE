@@ -90,11 +90,11 @@ export function useFarmProgress() {
         id: "daily-boost",
         title: "Activate Boost",
         description: boostActive
-          ? "2× GM & deploy — use the window"
-          : "Free once per day · ~1h of 2× points",
+          ? "2× GM & deploy — extend from Farm rank"
+          : "Free once per day · tap Boost on Farm rank",
         done: hubReady && isConnected && dailyBoostDone,
         pointsLabel: "2× all",
-        href: "/?tab=boost",
+        href: "/",
       },
       {
         id: "daily-gm",
@@ -105,7 +105,7 @@ export function useFarmProgress() {
             : "Connect wallet to track",
         done: hubReady && isConnected && dailyGmsDone,
         pointsLabel: "2× with Boost",
-        href: "/",
+        href: "/?section=play&tab=gm",
       },
       {
         id: "daily-deploy",
@@ -113,7 +113,7 @@ export function useFarmProgress() {
         description: "One free token deploy per day on Base",
         done: hubReady && isConnected && dailyDeployDone,
         pointsLabel: "2× with Boost",
-        href: "/?tab=deploy",
+        href: "/?section=play&tab=deploy",
       },
     ],
     [

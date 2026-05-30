@@ -7,8 +7,8 @@ import { AppLogo } from "@/components/AppLogo";
 import { APP_NAME, TOKEN_SYMBOL } from "@/config/app";
 
 const links = [
-  { href: "/", label: "App" },
-  { href: "/farm", label: "Farm", highlight: true as const },
+  { href: "/", label: "Farm", highlight: true as const },
+  { href: "/stake", label: "Token", tokenMark: true as const },
   { href: "/referral", label: "Refer" },
   { href: "/badges", label: "Badges" },
   { href: "/leaderboard", label: "Leaders" },
@@ -30,8 +30,9 @@ export function AppNav() {
         {links.map((link) => {
           const active =
             link.href === "/"
-              ? pathname === "/"
-              : pathname.startsWith(link.href);
+              ? pathname === "/" || pathname.startsWith("/farm")
+              : pathname.startsWith(link.href) ||
+                (link.href === "/stake" && pathname.startsWith("/airdrop"));
           const pulseFarm =
             "highlight" in link && link.highlight && !active;
           return (
@@ -42,7 +43,12 @@ export function AppNav() {
             >
               {"highlight" in link && link.highlight ? (
                 <>
-                  Farm{" "}
+                  {link.label}{" "}
+                  <span className="uni-tab-tb-mark">{TOKEN_SYMBOL}</span>
+                </>
+              ) : "tokenMark" in link && link.tokenMark ? (
+                <>
+                  {link.label}{" "}
                   <span className="uni-tab-tb-mark">{TOKEN_SYMBOL}</span>
                 </>
               ) : (

@@ -4,7 +4,7 @@ import type { BadgeDefinition, BadgeKind } from "@/config/badges";
 const KIND_CODE: Record<BadgeKind, string> = {
   gm: "GM",
   deploy: "DEP",
-  points: "PTS",
+  token: "A",
   rank: "RNK",
   collection: "COL",
   referral: "REF",
