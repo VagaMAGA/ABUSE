@@ -93,38 +93,39 @@ export function FarmBoostButton({
 
   const busy = isPending || isConfirming;
   const priceLabel = isPaidBoost ? `${feeLabel} ETH` : "Free";
-  const shouldPulse = !active && !disabled && !preview && !busy;
 
   return (
     <div className="flex shrink-0 flex-col items-end gap-1">
       <div
-        className={`uni-farm-boost-wrap ${shouldPulse ? "uni-farm-boost-wrap--pulse" : ""} ${active ? "uni-farm-boost-wrap--live" : ""}`}
+        className={`uni-farm-boost-shell ${active ? "uni-farm-boost-shell--live" : ""}`}
       >
         <button
           type="button"
           onClick={handleBoost}
           disabled={disabled || preview || busy}
-          className={`uni-farm-boost-btn ${active ? "uni-farm-boost-btn--live" : ""} ${shouldPulse ? "uni-farm-boost-btn--pulse" : ""}`}
+          className={`uni-farm-boost-btn ${active ? "uni-farm-boost-btn--live" : ""}`}
           aria-label={
             active
               ? `Boost active, ${formatBoostTime(secondsLeft)} left`
               : `Activate ${BOOST_GM_MULTIPLIER}× boost`
           }
         >
-        <span className="uni-farm-boost-mark">{BOOST_GM_MULTIPLIER}×</span>
-        <span className="uni-farm-boost-title">
-          {busy ? "…" : active ? "Extend" : "Boost"}
-        </span>
-        <span className="uni-farm-boost-sub">
-          {busy
-            ? "Wait"
-            : active
-              ? secondsLeft > 0
-                ? formatBoostTime(secondsLeft)
-                : "…"
-              : priceLabel}
-        </span>
-      </button>
+          <span className="uni-farm-boost-mark-wrap">
+            <span className="uni-farm-boost-mark">{BOOST_GM_MULTIPLIER}×</span>
+          </span>
+          <span className="uni-farm-boost-title">
+            {busy ? "…" : active ? "Extend" : "Boost"}
+          </span>
+          <span className="uni-farm-boost-sub">
+            {busy
+              ? "Wait"
+              : active
+                ? secondsLeft > 0
+                  ? formatBoostTime(secondsLeft)
+                  : "…"
+                : priceLabel}
+          </span>
+        </button>
       </div>
       {writeError && (
         <p className="max-w-[5.5rem] text-right text-[10px] leading-tight text-[var(--uni-critical)]">

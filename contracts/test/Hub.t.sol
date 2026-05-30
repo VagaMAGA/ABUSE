@@ -62,7 +62,7 @@ contract HubTest is Test {
         );
     }
 
-    function test_freeRemaining_afterThreeGms() public {
+    function test_freeRemaining_afterTwoGms() public {
         while (hub.freeGmsRemaining(alice) > 0) {
             vm.prank(alice);
             hub.gm();

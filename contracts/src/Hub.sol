@@ -12,7 +12,7 @@ interface IERC20Minimal {
 contract Hub {
     uint256 public constant POINTS_PER_FREE_GM = 10;
     uint256 public constant POINTS_PER_PAID_GM = 20;
-    uint256 public constant FREE_GM_PER_DAY = 3;
+    uint256 public constant FREE_GM_PER_DAY = 2;
     uint256 public constant GM_FEE = 0.0001 ether;
     uint256 public constant MIN_INTERVAL = 5;
 

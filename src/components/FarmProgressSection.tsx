@@ -17,6 +17,7 @@ import {
   PREVIEW_SETUP_TOTAL,
 } from "@/config/preview";
 import {
+  DAILY_FREE_GM_TARGET,
   DAILY_FREE_POINTS_MAX,
   farmRankForPoints,
   nextFarmRank,
@@ -124,7 +125,7 @@ export function FarmProgressSection({
   const dailyPct =
     dailyTotal > 0 ? Math.round((dailyDone / dailyTotal) * 100) : 0;
 
-  const projectedDaily = simulateDailyPoints(3, true);
+  const projectedDaily = simulateDailyPoints(DAILY_FREE_GM_TARGET, true);
   const projectedFriends = simulateReferralPoints(friendSlider);
   const projectedTotal = pointsNum + projectedDaily + projectedFriends;
 

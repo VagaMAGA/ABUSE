@@ -11,7 +11,7 @@ export const DEPLOY_CHAIN_ID = base.id;
 
 export const POINTS_PER_FREE_GM = 10;
 export const POINTS_PER_PAID_GM = 20;
-export const FREE_GM_PER_DAY = 3;
+export const FREE_GM_PER_DAY = 2;
 export const GM_FEE_WEI = BigInt("100000000000000");
 
 export const POINTS_PER_FREE_DEPLOY = 20;

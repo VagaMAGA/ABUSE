@@ -14,7 +14,7 @@ export const FARM_RANKS = [
 
 export const DAILY_FREE_GM_TARGET = FREE_GM_PER_DAY;
 
-/** Max free points from perfect daily loop (Boost + 3 GM + deploy) */
+/** Max free points from perfect daily loop (Boost + 2 GM + deploy) */
 export const DAILY_FREE_POINTS_MAX =
   (DAILY_FREE_GM_TARGET * POINTS_RULES.freeGm + POINTS_RULES.freeDeploy) *
   BOOST_GM_MULTIPLIER;

@@ -21,7 +21,7 @@ contract ConfigSyncTest is Test {
     function test_hubConstants_matchFrontend() public view {
         assertEq(hub.POINTS_PER_FREE_GM(), 10);
         assertEq(hub.POINTS_PER_PAID_GM(), 20);
-        assertEq(hub.FREE_GM_PER_DAY(), 3);
+        assertEq(hub.FREE_GM_PER_DAY(), 2);
         assertEq(hub.GM_FEE(), 0.0001 ether);
         assertEq(hub.MIN_INTERVAL(), 5);
         assertEq(hub.POINTS_PER_FREE_DEPLOY(), 20);
