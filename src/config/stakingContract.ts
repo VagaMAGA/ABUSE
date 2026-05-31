@@ -38,6 +38,13 @@ export const stakePoolAbi = [
   },
   {
     type: "function",
+    name: "totalActions",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "earned",
     inputs: [{ name: "account", type: "address" }],
     outputs: [{ name: "", type: "uint256" }],

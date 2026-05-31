@@ -265,6 +265,11 @@ contract BadgeNFT {
         return _milestoneMintedCount(user);
     }
 
+    /// @dev Total badge NFTs minted across all users
+    function totalMinted() external view returns (uint256) {
+        return nextTokenId - 1;
+    }
+
     function _milestoneMintedCount(address user) internal view returns (uint256) {
         uint256 count;
         for (uint256 t = 1; t <= MILESTONE_BADGE_MAX; t++) {

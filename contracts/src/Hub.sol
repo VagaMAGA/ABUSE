@@ -36,6 +36,8 @@ contract Hub {
     uint256 public totalGms;
     uint256 public totalDeploys;
     uint256 public totalBoosts;
+    /// @dev All user-initiated Hub actions (GM, deploy, boost, referral, airdrop claim)
+    uint256 public totalActions;
     address public owner;
     address public treasury;
 
@@ -167,6 +169,7 @@ contract Hub {
 
         require(IERC20Minimal(airdropToken).transfer(msg.sender, tokensOut), "transfer failed");
 
+        _recordAction();
         emit AirdropClaimed(msg.sender, pointsToSpend, tokensOut, points[msg.sender]);
     }
 
@@ -187,6 +190,7 @@ contract Hub {
         referralCodeOwner[h] = msg.sender;
         userReferralCodeHash[msg.sender] = h;
 
+        _recordAction();
         emit ReferralCodeRegistered(msg.sender, h);
     }
 
@@ -204,6 +208,7 @@ contract Hub {
         points[referrer] += POINTS_PER_REFERRAL;
         points[msg.sender] += POINTS_PER_REFERRAL;
 
+        _recordAction();
         emit ReferralCodeRedeemed(
             referrer,
             msg.sender,
@@ -239,6 +244,7 @@ contract Hub {
         boostCount[msg.sender] += 1;
         totalBoosts += 1;
 
+        _recordAction();
         emit BoostActivated(msg.sender, until, !isFree, block.timestamp);
     }
 
@@ -303,6 +309,7 @@ contract Hub {
         totalDeploys += 1;
         points[msg.sender] += pointsEarned;
 
+        _recordAction();
         emit TokenDeployed(
             msg.sender,
             token,
@@ -374,7 +381,12 @@ contract Hub {
         points[user] += pointsEarned;
         totalGms += 1;
 
+        _recordAction();
         emit GM(user, gmCount[user], points[user], !isFree, boosted, block.timestamp);
+    }
+
+    function _recordAction() internal {
+        totalActions += 1;
     }
 
     function _codeFromHash(bytes32 h) internal pure returns (string memory) {

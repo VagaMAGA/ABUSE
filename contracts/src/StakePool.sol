@@ -25,6 +25,7 @@ contract StakePool {
     address public owner;
 
     uint256 public totalStaked;
+    uint256 public totalActions;
     uint256 public rewardRatePerStakedToken;
     uint256 public lastUpdateTime;
     uint256 public rewardPerTokenStored;
@@ -79,6 +80,7 @@ contract StakePool {
             "transfer failed"
         );
 
+        totalActions += 1;
         emit Staked(msg.sender, amount, stakedBalance[msg.sender]);
     }
 
@@ -93,6 +95,7 @@ contract StakePool {
 
         require(stakingToken.transfer(msg.sender, amount), "transfer failed");
 
+        totalActions += 1;
         emit Unstaked(msg.sender, amount, stakedBalance[msg.sender]);
     }
 
@@ -103,24 +106,29 @@ contract StakePool {
         pendingRewards[msg.sender] = 0;
         require(stakingToken.transfer(msg.sender, reward), "reward transfer failed");
 
+        totalActions += 1;
         emit RewardClaimed(msg.sender, reward);
     }
 
     function exit() external updateReward(msg.sender) {
         uint256 reward = pendingRewards[msg.sender];
+        uint256 balance = stakedBalance[msg.sender];
+        if (reward == 0 && balance == 0) return;
+
         if (reward > 0) {
             pendingRewards[msg.sender] = 0;
             require(stakingToken.transfer(msg.sender, reward), "reward transfer failed");
             emit RewardClaimed(msg.sender, reward);
         }
 
-        uint256 balance = stakedBalance[msg.sender];
-        if (balance == 0) return;
+        if (balance > 0) {
+            totalStaked -= balance;
+            stakedBalance[msg.sender] = 0;
+            require(stakingToken.transfer(msg.sender, balance), "transfer failed");
+            emit Unstaked(msg.sender, balance, 0);
+        }
 
-        totalStaked -= balance;
-        stakedBalance[msg.sender] = 0;
-        require(stakingToken.transfer(msg.sender, balance), "transfer failed");
-        emit Unstaked(msg.sender, balance, 0);
+        totalActions += 1;
     }
 
     function fundRewards(uint256 amount) external {

@@ -41,6 +41,18 @@ contract HubTest is Test {
         assertEq(hub.gmCount(alice), 1);
         assertEq(hub.points(alice), hub.POINTS_PER_FREE_GM());
         assertEq(hub.totalGms(), 1);
+        assertEq(hub.totalActions(), 1);
+    }
+
+    function test_totalActions_countsMultipleActionTypes() public {
+        vm.prank(alice);
+        hub.gm();
+        vm.prank(alice);
+        hub.boost();
+        vm.prank(alice);
+        hub.registerReferralCode();
+
+        assertEq(hub.totalActions(), 3);
     }
 
     function test_paidGm_afterFreeQuota() public {

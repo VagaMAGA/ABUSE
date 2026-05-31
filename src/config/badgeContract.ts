@@ -62,6 +62,13 @@ export const badgeNftAbi = [
   },
   {
     type: "function",
+    name: "totalMinted",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "badgeThreshold",
     inputs: [{ name: "badgeType", type: "uint256" }],
     outputs: [{ name: "", type: "uint256" }],

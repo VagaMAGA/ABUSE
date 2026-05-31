@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { AppLogo } from "@/components/AppLogo";
+import { GlobalTxCounter } from "@/components/GlobalTxCounter";
 import { APP_NAME, TOKEN_SYMBOL } from "@/config/app";
 
 const links = [
@@ -26,6 +27,7 @@ export function AppNav() {
       >
         <AppLogo size={32} />
       </Link>
+      <GlobalTxCounter />
       <div className="uni-tabs uni-tabs-compact min-w-0 flex-1 basis-0">
         {links.map((link) => {
           const active =

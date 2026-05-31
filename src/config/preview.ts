@@ -17,6 +17,7 @@ export const PREVIEW_REFERRAL_POINTS =
 export const PREVIEW_CODE = "DEMO42";
 export const PREVIEW_FARM_POINTS = 420;
 export const PREVIEW_FARM_GM = 12;
+export const PREVIEW_TOTAL_TXS = 8420;
 export const PREVIEW_USER_RANK = 42;
 export const PREVIEW_USER_RANK_POINTS = "420";
 

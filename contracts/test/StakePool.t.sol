@@ -47,6 +47,7 @@ contract StakePoolTest is Test {
         pool.stake(500 ether);
         vm.stopPrank();
 
+        assertEq(pool.totalActions(), 1);
         assertEq(pool.stakedBalance(alice), 500 ether);
         assertEq(pool.totalStaked(), 500 ether);
 

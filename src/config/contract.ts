@@ -243,6 +243,13 @@ export const hubAbi = [
   },
   {
     type: "function",
+    name: "totalActions",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "BOOST_FEE",
     inputs: [],
     outputs: [{ name: "", type: "uint256" }],

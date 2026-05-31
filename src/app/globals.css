@@ -666,6 +666,10 @@ a.uni-tab.uni-tab-active .uni-tab-tb-mark {
   color: var(--uni-pink);
 }
 
+.uni-global-tx {
+  min-width: 3.75rem;
+}
+
 .uni-farm-boost-shell {
   position: relative;
   flex-shrink: 0;
