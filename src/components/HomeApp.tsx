@@ -14,21 +14,16 @@ import {
   FarmRankCard,
   type FarmTab,
 } from "@/components/FarmProgressSection";
-import { PreviewBanner } from "@/components/PreviewBanner";
 import { DeployPanel } from "@/components/DeployPanel";
 import { GmPanel } from "@/components/GmPanel";
 import { PointsRulesCard } from "@/components/PointsRulesCard";
 import {
   DEPLOY_CHAIN_ID,
   BOOST_GM_MULTIPLIER,
+  isContractConfigured,
 } from "@/config/contract";
 import { POINTS_PER_REFERRAL } from "@/config/referral";
-import {
-  isHubLiveMode,
-  PREVIEW_DEPLOY_COUNT,
-  PREVIEW_FARM_POINTS,
-  PREVIEW_POINTS,
-} from "@/config/preview";
+import { isHubLiveMode } from "@/config/preview";
 import { useFarmProgress } from "@/hooks/useFarmProgress";
 import { useFarcasterMiniApp } from "@/hooks/useFarcasterMiniApp";
 import { useHubStats } from "@/hooks/useHubStats";
@@ -83,17 +78,8 @@ export function HomeApp() {
 
   const { pointsNum: livePointsNum } = useFarmProgress();
 
-  const isLiveMode = isHubLiveMode({ isConnected, wrongChain });
-  const actionDisabled = !isLiveMode;
-  const displayPoints = isLiveMode
-    ? (points?.toString() ?? "0")
-    : String(PREVIEW_POINTS);
-  const displayPointsNum = isLiveMode ? livePointsNum : PREVIEW_FARM_POINTS;
-  const displayBoostActive = isLiveMode ? boostActive : true;
-  const displayDeployCount = isLiveMode
-    ? deployCount?.toString() ?? "0"
-    : String(PREVIEW_DEPLOY_COUNT);
-  const showContent = isLiveMode ? isConnected && !wrongChain : true;
+  const canAct = isHubLiveMode({ isConnected, wrongChain });
+  const showContent = isContractConfigured;
 
   return (
     <>
@@ -123,8 +109,6 @@ export function HomeApp() {
         </div>
       </header>
 
-      {!isLiveMode && <PreviewBanner />}
-
       <div className="uni-card px-4 py-5">
         <ConnectWallet />
       </div>
@@ -136,21 +120,21 @@ export function HomeApp() {
           disabled={isSwitching}
           onClick={() => switchChain({ chainId: DEPLOY_CHAIN_ID })}
         >
-          {isSwitching
-            ? "Switching…"
-            : isLiveMode
-              ? "Switch to Base"
-              : "Switch to Base (for live play)"}
+          {isSwitching ? "Switching…" : "Switch to Base"}
         </button>
+      )}
+
+      {!isConnected && isContractConfigured && (
+        <p className="uni-caption text-center">
+          Connect your wallet on Base to play and earn points.
+        </p>
       )}
 
       {showContent && (
         <>
           <FarmRankCard
-            pointsNum={displayPointsNum}
-            isLiveMode={isLiveMode}
-            boostDisabled={actionDisabled}
-            boostPreview={!isLiveMode}
+            pointsNum={livePointsNum}
+            boostDisabled={!canAct}
             onBoostSuccess={() => void refreshStats()}
           />
 
@@ -177,16 +161,9 @@ export function HomeApp() {
           {section === "play" ? (
             <div className="uni-card p-4">
               <div className="uni-card-inset mb-4 flex items-center justify-between gap-2 px-3 py-2">
-                <p className="uni-label shrink-0 leading-none">
-                  Total points
-                  {!isLiveMode && (
-                    <span className="ml-1 text-[10px] font-normal uppercase tracking-wide text-[var(--uni-text-tertiary)]">
-                      demo
-                    </span>
-                  )}
-                </p>
+                <p className="uni-label shrink-0 leading-none">Total points</p>
                 <p className="uni-mono text-lg font-semibold leading-none uni-text-accent">
-                  {displayPoints}
+                  {points?.toString() ?? "0"}
                 </p>
               </div>
 
@@ -199,7 +176,7 @@ export function HomeApp() {
                   >
                     GM
                   </button>
-                  {displayBoostActive && (
+                  {boostActive && (
                     <span className="uni-tab-2x-badge" aria-hidden>
                       {BOOST_GM_MULTIPLIER}×
                     </span>
@@ -213,7 +190,7 @@ export function HomeApp() {
                   >
                     Deploy
                   </button>
-                  {displayBoostActive && (
+                  {boostActive && (
                     <span className="uni-tab-2x-badge" aria-hidden>
                       {BOOST_GM_MULTIPLIER}×
                     </span>
@@ -222,12 +199,11 @@ export function HomeApp() {
               </div>
 
               {playTab === "gm" ? (
-                <GmPanel disabled={actionDisabled} preview={!isLiveMode} />
+                <GmPanel disabled={!canAct} />
               ) : (
                 <DeployPanel
-                  disabled={actionDisabled}
-                  preview={!isLiveMode}
-                  freeDeployAvailable={isLiveMode ? freeDeployAvailable : true}
+                  disabled={!canAct}
+                  freeDeployAvailable={freeDeployAvailable}
                   deployFeeOnChain={deployFeeOnChain}
                   onSuccess={() => void refreshStats()}
                 />
@@ -235,7 +211,6 @@ export function HomeApp() {
             </div>
           ) : (
             <FarmProgressSection
-              isLiveMode={isLiveMode}
               showFarm={showContent}
               tab={farmTab}
               onTabChange={setFarmTab}
@@ -243,14 +218,12 @@ export function HomeApp() {
           )}
 
           <p className="uni-caption text-center">
-            Deploys: <span className="uni-mono">{displayDeployCount}</span>
+            Deploys:{" "}
+            <span className="uni-mono">{deployCount?.toString() ?? "0"}</span>
             {" · "}
             <Link href="/badges" className="uni-link">
               Earn badges
             </Link>
-            {!isLiveMode && (
-              <span className="text-[var(--uni-text-tertiary)]"> (demo)</span>
-            )}
           </p>
         </>
       )}

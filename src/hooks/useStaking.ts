@@ -55,7 +55,7 @@ export function useStaking() {
       {
         address: STAKE_POOL_ADDRESS,
         abi: stakePoolAbi,
-        functionName: "rewardPoolBalance" as const,
+        functionName: "rewardReserve" as const,
         chainId: DEPLOY_CHAIN_ID,
       },
       {
@@ -83,7 +83,7 @@ export function useStaking() {
   const stakedWei = data?.[0]?.result as bigint | undefined;
   const earnedWei = data?.[1]?.result as bigint | undefined;
   const totalStakedWei = data?.[2]?.result as bigint | undefined;
-  const rewardPoolWei = data?.[3]?.result as bigint | undefined;
+  const rewardReserveWei = data?.[3]?.result as bigint | undefined;
   const walletBalanceWei = data?.[4]?.result as bigint | undefined;
   const allowanceWei = data?.[5]?.result as bigint | undefined;
 
@@ -167,7 +167,8 @@ export function useStaking() {
     staked: formatUnits(stakedWei ?? BigInt(0), 18),
     earned: formatUnits(earnedWei ?? BigInt(0), 18),
     totalStaked: formatUnits(totalStakedWei ?? BigInt(0), 18),
-    rewardPool: formatUnits(rewardPoolWei ?? BigInt(0), 18),
+    rewardReserve: formatUnits(rewardReserveWei ?? BigInt(0), 18),
+    rewardReserveWei: rewardReserveWei ?? BigInt(0),
     walletBalance: formatUnits(walletBalanceWei ?? BigInt(0), 18),
     stakedWei: stakedWei ?? BigInt(0),
     earnedWei: earnedWei ?? BigInt(0),

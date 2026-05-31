@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useAccount, useChainId, useSwitchChain } from "wagmi";
@@ -8,7 +8,6 @@ import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import { AirdropClaimPanel } from "@/components/AirdropClaimPanel";
 import { AppNav } from "@/components/AppNav";
 import { ConnectWallet } from "@/components/ConnectWallet";
-import { PreviewBanner } from "@/components/PreviewBanner";
 import { StakePanel } from "@/components/StakePanel";
 import { APP_NAME, TOKEN_SYMBOL } from "@/config/app";
 import { AIRDROP_MIN_POINTS } from "@/config/airdrop";
@@ -75,8 +74,6 @@ export function TokenApp() {
         </p>
       </header>
 
-      {!hubLive && <PreviewBanner />}
-
       <div className="uni-card px-4 py-5">
         <ConnectWallet />
       </div>
@@ -90,6 +87,12 @@ export function TokenApp() {
         >
           {isSwitching ? "Switching…" : "Switch to Base"}
         </button>
+      )}
+
+      {!hubLive && (
+        <p className="uni-caption text-center">
+          Connect on Base to claim or stake {TOKEN_SYMBOL}.
+        </p>
       )}
 
       <div className="uni-card px-2 py-2">
@@ -112,9 +115,9 @@ export function TokenApp() {
       </div>
 
       {tab === "claim" ? (
-        <AirdropClaimPanel isLiveMode={claimLive} onSuccess={onClaimSuccess} />
+        <AirdropClaimPanel canAct={claimLive} onSuccess={onClaimSuccess} />
       ) : (
-        <StakePanel isLiveMode={stakeLive} />
+        <StakePanel canAct={stakeLive} />
       )}
 
       <div className="uni-card-inset px-4 py-3">
@@ -155,12 +158,6 @@ export function TokenApp() {
             <span className="uni-code">STAKE_POOL_ADDRESS</span> in config.
           </p>
         </div>
-      )}
-
-      {!claimLive && !stakeLive && (
-        <p className="uni-caption text-center">
-          Demo mode — connect on Base with contracts configured for live txs.
-        </p>
       )}
     </>
   );

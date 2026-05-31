@@ -11,8 +11,8 @@ interface IHubReader {
 
 /// @title BadgeNFT — milestone badges (GM, deploy, points, leaderboard rank)
 contract BadgeNFT {
-    string public constant NAME = "tinyBig Badges";
-    string public constant SYMBOL = "TBIGB";
+    string public constant NAME = "ABUSE Badges";
+    string public constant SYMBOL = "ABUSE";
 
     uint8 internal constant CAT_GM = 1;
     uint8 internal constant CAT_DEPLOY = 2;
@@ -218,13 +218,13 @@ contract BadgeNFT {
 
         if (category == CAT_GM) {
             return string(
-                abi.encodePacked("tinyBig Badge: GM ", _uintToString(threshold))
+                abi.encodePacked("ABUSE Badge: GM ", _uintToString(threshold))
             );
         }
         if (category == CAT_DEPLOY) {
             return string(
                 abi.encodePacked(
-                    "tinyBig Badge: Deploy ",
+                    "ABUSE Badge: Deploy ",
                     _uintToString(threshold)
                 )
             );
@@ -232,7 +232,7 @@ contract BadgeNFT {
         if (category == CAT_TOKEN) {
             return string(
                 abi.encodePacked(
-                    "tinyBig Badge: $A ",
+                    "ABUSE Badge: $A ",
                     _uintToString(threshold)
                 )
             );
@@ -240,7 +240,7 @@ contract BadgeNFT {
         if (category == CAT_COLLECTION) {
             return string(
                 abi.encodePacked(
-                    "tinyBig Badge: Collection ",
+                    "ABUSE Badge: Collection ",
                     _uintToString(threshold)
                 )
             );
@@ -248,14 +248,14 @@ contract BadgeNFT {
         if (category == CAT_REFERRAL) {
             return string(
                 abi.encodePacked(
-                    "tinyBig Badge: Referral ",
+                    "ABUSE Badge: Referral ",
                     _uintToString(threshold)
                 )
             );
         }
         return string(
             abi.encodePacked(
-                "tinyBig Badge: Top ",
+                "ABUSE Badge: Top ",
                 _uintToString(threshold)
             )
         );

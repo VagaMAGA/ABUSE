@@ -4,7 +4,7 @@ pragma solidity ^0.8.24;
 /// @title AbuseToken — $A airdrop ERC20 held by Hub for point redemptions
 contract AbuseToken {
     string public constant name = "ABUSE";
-    string public constant symbol = "A";
+    string public constant symbol = "$A";
     uint8 public constant decimals = 18;
 
     uint256 public totalSupply;

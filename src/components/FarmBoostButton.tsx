@@ -18,7 +18,6 @@ import { useHubStats } from "@/hooks/useHubStats";
 
 type FarmBoostButtonProps = {
   disabled?: boolean;
-  preview?: boolean;
   onSuccess?: () => void;
 };
 
@@ -30,7 +29,6 @@ function formatBoostTime(seconds: number) {
 
 export function FarmBoostButton({
   disabled,
-  preview,
   onSuccess,
 }: FarmBoostButtonProps) {
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
@@ -70,16 +68,15 @@ export function FarmBoostButton({
 
   const feeWei = boostFeeOnChain ?? BOOST_FEE_WEI;
   const feeLabel = formatEther(feeWei);
-  const isPaidBoost = preview ? false : freeBoostAvailable === false;
-  const active = preview ? true : (boostActive ?? false);
+  const isPaidBoost = freeBoostAvailable === false;
+  const active = boostActive ?? false;
 
   const secondsLeft = useMemo(() => {
-    if (preview) return 42 * 60 + 18;
     if (!boostActiveUntil) return 0;
     const until = Number(boostActiveUntil);
     if (until === 0) return 0;
     return Math.max(0, until - now);
-  }, [boostActiveUntil, now, preview]);
+  }, [boostActiveUntil, now]);
 
   const handleBoost = () => {
     writeContract({
@@ -102,7 +99,7 @@ export function FarmBoostButton({
         <button
           type="button"
           onClick={handleBoost}
-          disabled={disabled || preview || busy}
+          disabled={disabled || busy}
           className={`uni-farm-boost-btn ${active ? "uni-farm-boost-btn--live" : ""}`}
           aria-label={
             active

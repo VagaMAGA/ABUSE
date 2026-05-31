@@ -14,6 +14,7 @@ interface IERC20Stake {
 }
 
 /// @title StakePool — stake $A and earn $A rewards from the pool budget
+/// @dev Rewards accrue at REWARD_RATE_PER_STAKED_TOKEN until rewardReserve is depleted.
 contract StakePool {
     uint256 public constant MIN_STAKE = 500 ether;
     uint256 public constant REWARD_SCALE = 1e18;
@@ -26,6 +27,8 @@ contract StakePool {
 
     uint256 public totalStaked;
     uint256 public totalActions;
+    /// @dev Remaining reward budget — accrual stops when this reaches zero
+    uint256 public rewardReserve;
     uint256 public rewardRatePerStakedToken;
     uint256 public lastUpdateTime;
     uint256 public rewardPerTokenStored;
@@ -50,8 +53,7 @@ contract StakePool {
     }
 
     modifier updateReward(address account) {
-        rewardPerTokenStored = _currentRewardPerToken();
-        lastUpdateTime = block.timestamp;
+        _accrueRewards();
 
         if (account != address(0)) {
             pendingRewards[account] = earned(account);
@@ -104,10 +106,9 @@ contract StakePool {
         if (reward == 0) return;
 
         pendingRewards[msg.sender] = 0;
-        require(stakingToken.transfer(msg.sender, reward), "reward transfer failed");
+        _payReward(msg.sender, reward);
 
         totalActions += 1;
-        emit RewardClaimed(msg.sender, reward);
     }
 
     function exit() external updateReward(msg.sender) {
@@ -117,8 +118,7 @@ contract StakePool {
 
         if (reward > 0) {
             pendingRewards[msg.sender] = 0;
-            require(stakingToken.transfer(msg.sender, reward), "reward transfer failed");
-            emit RewardClaimed(msg.sender, reward);
+            _payReward(msg.sender, reward);
         }
 
         if (balance > 0) {
@@ -137,12 +137,11 @@ contract StakePool {
             stakingToken.transferFrom(msg.sender, address(this), amount),
             "fund failed"
         );
+        rewardReserve += amount;
         emit RewardsFunded(msg.sender, amount);
     }
 
-    function setRewardRate(uint256 newRate) external onlyOwner {
-        rewardPerTokenStored = _currentRewardPerToken();
-        lastUpdateTime = block.timestamp;
+    function setRewardRate(uint256 newRate) external onlyOwner updateReward(address(0)) {
         rewardRatePerStakedToken = newRate;
         emit RewardRateUpdated(newRate);
     }
@@ -152,6 +151,9 @@ contract StakePool {
         owner = newOwner;
     }
 
+    /// @notice Flush accrued rewards into storage (anyone may call)
+    function sync() external updateReward(address(0)) {}
+
     function earned(address account) public view returns (uint256) {
         uint256 perToken = _currentRewardPerToken();
         uint256 staked = stakedBalance[account];
@@ -159,16 +161,61 @@ contract StakePool {
         return (staked * delta) / REWARD_SCALE + pendingRewards[account];
     }
 
+    /// @notice Total ERC20 balance (principal + unclaimed rewards)
     function rewardPoolBalance() external view returns (uint256) {
         return stakingToken.balanceOf(address(this));
     }
 
+    function _accrueRewards() internal {
+        if (totalStaked == 0 || rewardReserve == 0) {
+            lastUpdateTime = block.timestamp;
+            return;
+        }
+
+        uint256 elapsed = block.timestamp - lastUpdateTime;
+        if (elapsed == 0) return;
+
+        uint256 rawDelta = elapsed * rewardRatePerStakedToken;
+        uint256 maxDelta = (rewardReserve * REWARD_SCALE) / totalStaked;
+        uint256 delta = rawDelta > maxDelta ? maxDelta : rawDelta;
+
+        if (delta > 0) {
+            uint256 consumed = (totalStaked * delta) / REWARD_SCALE;
+            if (consumed > rewardReserve) {
+                consumed = rewardReserve;
+            }
+            rewardReserve -= consumed;
+            rewardPerTokenStored += delta;
+        }
+
+        lastUpdateTime = block.timestamp;
+    }
+
     function _currentRewardPerToken() internal view returns (uint256) {
-        if (totalStaked == 0) {
+        if (totalStaked == 0 || rewardReserve == 0) {
             return rewardPerTokenStored;
         }
 
         uint256 elapsed = block.timestamp - lastUpdateTime;
-        return rewardPerTokenStored + elapsed * rewardRatePerStakedToken;
+        if (elapsed == 0) {
+            return rewardPerTokenStored;
+        }
+
+        uint256 rawDelta = elapsed * rewardRatePerStakedToken;
+        uint256 maxDelta = (rewardReserve * REWARD_SCALE) / totalStaked;
+        uint256 delta = rawDelta > maxDelta ? maxDelta : rawDelta;
+        return rewardPerTokenStored + delta;
+    }
+
+    function _payReward(address to, uint256 reward) internal {
+        uint256 bal = stakingToken.balanceOf(address(this));
+        uint256 maxReward = bal > totalStaked ? bal - totalStaked : 0;
+        if (reward > maxReward) {
+            reward = maxReward;
+        }
+        if (reward == 0) return;
+
+        require(stakingToken.transfer(to, reward), "reward transfer failed");
+        emit RewardClaimed(to, reward);
     }
 }

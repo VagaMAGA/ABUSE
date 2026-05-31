@@ -14,11 +14,7 @@ import {
   HUB_CONTRACT_ADDRESS,
   hubAbi,
 } from "@/config/contract";
-import { pointsForDeploy, POINTS_RULES } from "@/config/points";
-import {
-  PREVIEW_DEPLOY_COUNT,
-  PREVIEW_POINTS,
-} from "@/config/preview";
+import { pointsForDeploy } from "@/config/points";
 import { useHubStats } from "@/hooks/useHubStats";
 
 function explorerAddressUrl(address: string) {
@@ -33,7 +29,6 @@ type DeployPanelProps = {
   freeDeployAvailable?: boolean;
   deployFeeOnChain?: bigint;
   disabled?: boolean;
-  preview?: boolean;
   onSuccess?: () => void;
 };
 
@@ -41,7 +36,6 @@ export function DeployPanel({
   freeDeployAvailable = true,
   deployFeeOnChain,
   disabled,
-  preview,
   onSuccess,
 }: DeployPanelProps) {
   const [tokenName, setTokenName] = useState("");
@@ -60,13 +54,12 @@ export function DeployPanel({
     return () => clearInterval(t);
   }, []);
 
-  const boostActive = preview
-    ? true
-    : boostActiveUntil != null && Number(boostActiveUntil) > now;
+  const boostActive =
+    boostActiveUntil != null && Number(boostActiveUntil) > now;
 
   const feeWei = deployFeeOnChain ?? DEPLOY_FEE_WEI;
   const feeLabel = formatEther(feeWei);
-  const isPaidDeploy = preview ? false : !freeDeployAvailable;
+  const isPaidDeploy = !freeDeployAvailable;
 
   const { data: hash, isPending, writeContract, error: writeError, reset } =
     useWriteContract();
@@ -127,14 +120,9 @@ export function DeployPanel({
       <div className="grid grid-cols-2 gap-2">
         <DeployStat
           label="Your deploys"
-          value={
-            preview ? String(PREVIEW_DEPLOY_COUNT) : deployCount?.toString() ?? "0"
-          }
+          value={deployCount?.toString() ?? "0"}
         />
-        <DeployStat
-          label="Points"
-          value={preview ? String(PREVIEW_POINTS) : points?.toString() ?? "0"}
-        />
+        <DeployStat label="Points" value={points?.toString() ?? "0"} />
       </div>
 
       {boostActive && (
@@ -144,7 +132,7 @@ export function DeployPanel({
       )}
 
       <p className="uni-caption text-center">
-        {preview || freeDeployAvailable
+        {freeDeployAvailable
           ? `1 free deploy per day · +${pointsForDeploy(false, boostActive)} pts`
           : `Paid deploy · ${feeLabel} ETH · +${pointsForDeploy(true, boostActive)} pts`}
       </p>
@@ -191,7 +179,7 @@ export function DeployPanel({
       <button
         type="button"
         onClick={handleDeploy}
-        disabled={disabled || preview || !canSubmit || isPending || isConfirming}
+        disabled={disabled || !canSubmit || isPending || isConfirming}
         className="uni-btn uni-btn-primary"
       >
         {isPending

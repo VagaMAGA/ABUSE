@@ -2,7 +2,7 @@ import { DEPLOY_CHAIN_ID } from "@/config/contract";
 
 /** Set after deploying StakePool.sol */
 export const STAKE_POOL_ADDRESS: `0x${string}` =
-  "0x0000000000000000000000000000000000000000";
+  "0xBf9338260f50635EcBFc3d71DE01022790912A32";
 
 export const isStakePoolConfigured =
   STAKE_POOL_ADDRESS !== "0x0000000000000000000000000000000000000000";
@@ -56,6 +56,20 @@ export const stakePoolAbi = [
     inputs: [],
     outputs: [{ name: "", type: "uint256" }],
     stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "rewardReserve",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "sync",
+    inputs: [],
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
     type: "function",

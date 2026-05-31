@@ -3,7 +3,7 @@
 import { useGlobalTxCount } from "@/hooks/useGlobalTxCount";
 
 export function GlobalTxCounter() {
-  const { formatted, isLive, isLoading } = useGlobalTxCount();
+  const { formatted, isLoading } = useGlobalTxCount();
 
   return (
     <div
@@ -15,11 +15,6 @@ export function GlobalTxCounter() {
       </span>
       <span className="uni-mono text-sm font-semibold leading-tight text-[var(--uni-pink)]">
         {isLoading ? "…" : formatted}
-        {!isLive && (
-          <span className="ml-1 text-[9px] font-normal normal-case tracking-normal text-[var(--uni-text-tertiary)]">
-            demo
-          </span>
-        )}
       </span>
     </div>
   );

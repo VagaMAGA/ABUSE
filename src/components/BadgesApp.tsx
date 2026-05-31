@@ -8,7 +8,6 @@ import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import { AppNav } from "@/components/AppNav";
 import { BadgeCard } from "@/components/BadgeCard";
 import { ConnectWallet } from "@/components/ConnectWallet";
-import { PreviewBanner } from "@/components/PreviewBanner";
 import { TOKEN_SYMBOL } from "@/config/app";
 import type { BadgeDefinition, BadgeKind } from "@/config/badges";
 import { BADGES } from "@/config/badges";
@@ -47,44 +46,6 @@ const SECTION_LABELS: Record<BadgeKind, string> = {
   referral: "Referral milestones",
 };
 
-/** Demo states so badge art is visible before wallet + deploy */
-function buildPreviewBadges(): DisplayBadge[] {
-  return BADGES.map((badge, index) => {
-    const mod = index % 4;
-    const minted = mod === 0;
-    const canMint = mod === 1;
-    const eligible = minted || canMint;
-
-    return {
-      ...badge,
-      minted,
-      eligible,
-      canMint,
-      userRank: badge.kind === "rank" ? (canMint ? badge.threshold : 999) : null,
-      rankSignerReady: false,
-      rankSignerReason: "missing",
-    };
-  });
-}
-
-const PREVIEW_BADGES = buildPreviewBadges();
-
-function previewCount(badge: BadgeDefinition, index: number): bigint | undefined {
-  if (badge.kind === "rank" || badge.kind === "collection") return undefined;
-  const mod = index % 4;
-  if (mod === 0 || mod === 1) return BigInt(badge.threshold);
-  if (mod === 2) return BigInt(Math.max(1, Math.floor(badge.threshold * 0.45)));
-  return BigInt(0);
-}
-
-function previewMilestoneCount(index: number): number {
-  const mod = index % 4;
-  if (mod === 0) return 16;
-  if (mod === 1) return 8;
-  if (mod === 2) return 3;
-  return 0;
-}
-
 export function BadgesApp() {
   const [tab, setTab] = useState<BadgeTab>("all");
   const { isConnected } = useAccount();
@@ -94,22 +55,17 @@ export function BadgesApp() {
 
   const { gmCount, deployCount, airdropClaimed, referralCount } = useHubStats();
   const {
-    badges: liveBadges,
+    badges: displayBadges,
     refresh,
     isLoading,
-    isConfigured,
     userRank,
     milestoneMintedCount: milestoneMintedOnChain,
   } = useBadgeStatus();
 
-  const isLiveMode = isBadgeLiveMode({ isConnected, wrongChain });
-
-  const displayBadges: DisplayBadge[] = isLiveMode ? liveBadges : PREVIEW_BADGES;
+  const canAct = isBadgeLiveMode({ isConnected, wrongChain });
 
   const mintedCount = displayBadges.filter((b) => b.minted).length;
-  const milestoneMintedCount = isLiveMode
-    ? Number(milestoneMintedOnChain)
-    : 6;
+  const milestoneMintedCount = Number(milestoneMintedOnChain);
   const readyCount = displayBadges.filter((b) => b.canMint).length;
   const collectionProgress = Math.round((mintedCount / BADGES.length) * 100);
 
@@ -137,23 +93,6 @@ export function BadgesApp() {
   }, [displayBadges, filteredBadges, tab]);
 
   const statForKind = (kind: BadgeKind) => {
-    if (!isLiveMode) {
-      switch (kind) {
-        case "gm":
-          return "12";
-        case "deploy":
-          return "4";
-        case "token":
-          return "1000";
-        case "rank":
-          return "#42";
-        case "collection":
-          return "6";
-        case "referral":
-          return "2";
-      }
-    }
-
     switch (kind) {
       case "gm":
         return gmCount?.toString() ?? "0";
@@ -172,8 +111,7 @@ export function BadgesApp() {
     }
   };
 
-  const mintDisabled =
-    !isLiveMode || isLoading;
+  const mintDisabled = !canAct || isLoading;
 
   return (
     <>
@@ -197,11 +135,6 @@ export function BadgesApp() {
                 <span className="text-[var(--uni-text-tertiary)]">
                   /{BADGES.length}
                 </span>
-                {!isLiveMode && (
-                  <span className="ml-1 text-[10px] font-normal uppercase tracking-wide text-[var(--uni-text-tertiary)]">
-                    preview
-                  </span>
-                )}
               </p>
             </div>
             <div className="uni-badges-collection-bar">
@@ -213,7 +146,6 @@ export function BadgesApp() {
             {readyCount > 0 && (
               <p className="uni-caption mt-2 text-center text-[var(--uni-pink)]">
                 {readyCount} badge{readyCount === 1 ? "" : "s"} ready to mint
-                {!isLiveMode ? " (demo)" : ""}
               </p>
             )}
           </div>
@@ -247,8 +179,6 @@ export function BadgesApp() {
         </div>
       </header>
 
-      {!isLiveMode && <PreviewBanner />}
-
       <div className="uni-card px-4 py-4">
         <ConnectWallet />
       </div>
@@ -262,6 +192,12 @@ export function BadgesApp() {
         >
           {isSwitching ? "Switching…" : "Switch to Base"}
         </button>
+      )}
+
+      {!canAct && (
+        <p className="uni-caption text-center">
+          Connect on Base to see eligibility and mint badges.
+        </p>
       )}
 
       <div className="uni-badges-tabs">
@@ -285,56 +221,45 @@ export function BadgesApp() {
                 {SECTION_LABELS[section.kind]}
               </h2>
             )}
-            {section.items.map((badge) => {
-              const badgeIndex = BADGES.findIndex((b) => b.id === badge.id);
-              return (
-                <BadgeCard
-                  key={badge.id}
-                  badge={badge}
-                  minted={badge.minted}
-                  eligible={badge.eligible}
-                  canMint={badge.canMint}
-                  currentCount={
-                    isLiveMode
-                      ? badge.kind === "gm"
-                        ? gmCount
-                        : badge.kind === "deploy"
-                          ? deployCount
-                          : badge.kind === "token"
-                            ? airdropClaimed
-                            : badge.kind === "referral"
-                              ? referralCount
-                              : undefined
-                      : previewCount(badge, badgeIndex)
-                  }
-                  milestoneMintedCount={
-                    isLiveMode
-                      ? milestoneMintedCount
-                      : previewMilestoneCount(badgeIndex)
-                  }
-                  userRank={badge.userRank}
-                  rankSignerReady={badge.rankSignerReady}
-                  rankSignerReason={badge.rankSignerReason}
-                  disabled={mintDisabled}
-                  onMinted={() => void refresh()}
-                />
-              );
-            })}
+            {section.items.map((badge) => (
+              <BadgeCard
+                key={badge.id}
+                badge={badge}
+                minted={badge.minted}
+                eligible={badge.eligible}
+                canMint={badge.canMint}
+                currentCount={
+                  badge.kind === "gm"
+                    ? gmCount
+                    : badge.kind === "deploy"
+                      ? deployCount
+                      : badge.kind === "token"
+                        ? airdropClaimed
+                        : badge.kind === "referral"
+                          ? referralCount
+                          : undefined
+                }
+                milestoneMintedCount={milestoneMintedCount}
+                userRank={badge.userRank}
+                rankSignerReady={badge.rankSignerReady}
+                rankSignerReason={badge.rankSignerReason}
+                disabled={mintDisabled}
+                onMinted={() => void refresh()}
+              />
+            ))}
           </div>
         ))}
       </div>
 
-      {isLiveMode && isLoading && (
+      {canAct && isLoading && (
         <p className="uni-caption uni-pulse text-center">Syncing badges…</p>
       )}
 
-      {!isLiveMode && (
-        <p className="uni-caption text-center">
-          <Link href="/leaderboard" className="uni-link text-sm">
-            View leaderboard →
-          </Link>
-        </p>
-      )}
+      <p className="uni-caption text-center">
+        <Link href="/leaderboard" className="uni-link text-sm">
+          View leaderboard →
+        </Link>
+      </p>
     </>
   );
 }

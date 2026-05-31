@@ -5,30 +5,26 @@ import { parseUnits } from "viem";
 
 import { TOKEN_SYMBOL } from "@/config/app";
 import {
-  PREVIEW_STAKED_A,
-  PREVIEW_STAKING_EARNED,
-  PREVIEW_STAKING_WALLET,
-  PREVIEW_TOTAL_STAKED,
-} from "@/config/preview";
-import {
   MIN_STAKE_A,
   MIN_STAKE_WEI,
   estimatedApyPercent,
   poolDailyRewards,
   userDailyRewards,
+  STAKING_APY_PERCENT,
 } from "@/config/staking";
 import { useStaking } from "@/hooks/useStaking";
 
 type StakePanelProps = {
-  isLiveMode: boolean;
+  canAct: boolean;
 };
 
-export function StakePanel({ isLiveMode }: StakePanelProps) {
+export function StakePanel({ canAct }: StakePanelProps) {
   const {
     staked,
     earned,
     totalStaked,
-    rewardPool,
+    rewardReserve,
+    rewardReserveWei,
     walletBalance,
     stakedWei,
     earnedWei,
@@ -46,21 +42,9 @@ export function StakePanel({ isLiveMode }: StakePanelProps) {
     reset,
   } = useStaking();
 
-  const displayStaked = isLiveMode ? staked : PREVIEW_STAKED_A;
-  const displayEarned = isLiveMode ? earned : PREVIEW_STAKING_EARNED;
-  const displayWallet = isLiveMode ? walletBalance : PREVIEW_STAKING_WALLET;
-  const displayTotalStaked = isLiveMode ? totalStaked : PREVIEW_TOTAL_STAKED;
-  const displayRewardPool = isLiveMode ? rewardPool : "50,000";
-
-  const displayStakedWei = isLiveMode
-    ? stakedWei
-    : parseUnits(PREVIEW_STAKED_A, 18);
-  const displayTotalStakedWei = isLiveMode
-    ? totalStakedWei
-    : parseUnits(PREVIEW_TOTAL_STAKED.replace(/,/g, ""), 18);
-
-  const dailyRewards = userDailyRewards(displayStakedWei);
-  const apy = estimatedApyPercent();
+  const dailyRewards = userDailyRewards(stakedWei);
+  const apy = estimatedApyPercent(rewardReserveWei, totalStakedWei);
+  const rewardsPaused = canAct && rewardReserveWei === BigInt(0);
 
   const [stakeAmount, setStakeAmount] = useState(String(MIN_STAKE_A));
   const [unstakeAmount, setUnstakeAmount] = useState("");
@@ -90,33 +74,31 @@ export function StakePanel({ isLiveMode }: StakePanelProps) {
   }, [unstakeAmount]);
 
   const canStakeNow =
-    isLiveMode &&
+    canAct &&
     stakeWei >= MIN_STAKE_WEI &&
     stakeWei <= walletBalanceWei;
 
   const canUnstakeNow =
-    isLiveMode && unstakeWei > BigInt(0) && unstakeWei <= stakedWei;
+    canAct && unstakeWei > BigInt(0) && unstakeWei <= stakedWei;
 
-  const canClaimNow = isLiveMode && earnedWei > BigInt(0);
-
-  const actionsDisabled = !isLiveMode;
+  const canClaimNow = canAct && earnedWei > BigInt(0);
 
   return (
     <>
       <div className="grid grid-cols-2 gap-2">
         <div className="uni-card-inset px-3 py-2.5">
           <p className="uni-label">Wallet {TOKEN_SYMBOL}</p>
-          <p className="uni-mono mt-0.5 text-lg font-semibold">{displayWallet}</p>
+          <p className="uni-mono mt-0.5 text-lg font-semibold">{walletBalance}</p>
         </div>
         <div className="uni-card-inset px-3 py-2.5">
           <p className="uni-label">Staked</p>
           <p className="uni-mono mt-0.5 text-lg font-semibold uni-text-accent">
-            {displayStaked}
+            {staked}
           </p>
         </div>
         <div className="uni-card-inset px-3 py-2.5">
           <p className="uni-label">Pending rewards</p>
-          <p className="uni-mono mt-0.5 text-lg font-semibold">{displayEarned}</p>
+          <p className="uni-mono mt-0.5 text-lg font-semibold">{earned}</p>
         </div>
         <div className="uni-card-inset px-3 py-2.5">
           <p className="uni-label">Est. APY</p>
@@ -130,13 +112,23 @@ export function StakePanel({ isLiveMode }: StakePanelProps) {
         <p className="uni-label">Pool stats</p>
         <div className="uni-caption mt-2 space-y-1">
           <p>
-            Total staked: {displayTotalStaked} {TOKEN_SYMBOL}
+            Total staked: {totalStaked} {TOKEN_SYMBOL}
           </p>
           <p>
-            Reward budget: {displayRewardPool} {TOKEN_SYMBOL}
+            Rewards remaining: {rewardReserve} {TOKEN_SYMBOL}
           </p>
+          {rewardsPaused && (
+            <p className="text-[var(--uni-warning)]">
+              Reward pool depleted — accrual paused. Unstake anytime.
+            </p>
+          )}
+          {canAct && apy > 0 && apy < STAKING_APY_PERCENT && (
+            <p className="text-[var(--uni-text-tertiary)]">
+              Effective APY capped by remaining budget (~{apy}% at current TVL)
+            </p>
+          )}
           <p>
-            Pool emission: ~{poolDailyRewards(displayTotalStakedWei).toFixed(2)}{" "}
+            Pool emission: ~{poolDailyRewards(totalStakedWei).toFixed(2)}{" "}
             {TOKEN_SYMBOL}/day
           </p>
           {dailyRewards > 0 && (
@@ -150,14 +142,15 @@ export function StakePanel({ isLiveMode }: StakePanelProps) {
       <div className="uni-card px-4 py-4">
         <p className="uni-label">Stake {TOKEN_SYMBOL}</p>
         <p className="uni-caption mt-1">
-          Min {MIN_STAKE_A} {TOKEN_SYMBOL} · {apy}% APY
+          Min {MIN_STAKE_A} {TOKEN_SYMBOL}
+          {apy > 0 ? ` · ${apy}% APY` : ""}
         </p>
         <input
           type="number"
           min={MIN_STAKE_A}
           step={1}
           value={stakeAmount}
-          disabled={actionsDisabled}
+          disabled={!canAct}
           onChange={(e) => setStakeAmount(e.target.value)}
           className="uni-input mt-3 w-full"
           placeholder={String(MIN_STAKE_A)}
@@ -165,7 +158,7 @@ export function StakePanel({ isLiveMode }: StakePanelProps) {
         <button
           type="button"
           className="uni-btn uni-btn-primary mt-3 w-full"
-          disabled={actionsDisabled || !canStakeNow || isPending || isConfirming}
+          disabled={!canAct || !canStakeNow || isPending || isConfirming}
           onClick={() => void stake(stakeWei)}
         >
           {isPending
@@ -183,7 +176,7 @@ export function StakePanel({ isLiveMode }: StakePanelProps) {
           min={0}
           step={1}
           value={unstakeAmount}
-          disabled={actionsDisabled || stakedWei === BigInt(0)}
+          disabled={!canAct || stakedWei === BigInt(0)}
           onChange={(e) => setUnstakeAmount(e.target.value)}
           className="uni-input mt-3 w-full"
           placeholder="0"
@@ -192,9 +185,7 @@ export function StakePanel({ isLiveMode }: StakePanelProps) {
           <button
             type="button"
             className="uni-btn uni-btn-secondary flex-1"
-            disabled={
-              actionsDisabled || !canUnstakeNow || isPending || isConfirming
-            }
+            disabled={!canAct || !canUnstakeNow || isPending || isConfirming}
             onClick={() => void unstake(unstakeWei)}
           >
             Unstake
@@ -202,9 +193,7 @@ export function StakePanel({ isLiveMode }: StakePanelProps) {
           <button
             type="button"
             className="uni-btn uni-btn-secondary flex-1"
-            disabled={
-              actionsDisabled || !canClaimNow || isPending || isConfirming
-            }
+            disabled={!canAct || !canClaimNow || isPending || isConfirming}
             onClick={() => void claimReward()}
           >
             Claim rewards
@@ -214,7 +203,7 @@ export function StakePanel({ isLiveMode }: StakePanelProps) {
           type="button"
           className="uni-btn mt-2 w-full"
           disabled={
-            actionsDisabled ||
+            !canAct ||
             (stakedWei === BigInt(0) && earnedWei === BigInt(0)) ||
             isPending ||
             isConfirming

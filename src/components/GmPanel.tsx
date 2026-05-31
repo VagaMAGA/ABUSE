@@ -15,11 +15,7 @@ import {
   HUB_CONTRACT_ADDRESS,
   hubAbi,
 } from "@/config/contract";
-import { pointsForGm, POINTS_RULES } from "@/config/points";
-import {
-  PREVIEW_GM_COUNT,
-  PREVIEW_POINTS,
-} from "@/config/preview";
+import { pointsForGm } from "@/config/points";
 import { useHubStats } from "@/hooks/useHubStats";
 
 function explorerTxUrl(hash: string) {
@@ -28,10 +24,9 @@ function explorerTxUrl(hash: string) {
 
 type GmPanelProps = {
   disabled?: boolean;
-  preview?: boolean;
 };
 
-export function GmPanel({ disabled, preview }: GmPanelProps) {
+export function GmPanel({ disabled }: GmPanelProps) {
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
   const syncedTxHash = useRef<string | undefined>(undefined);
 
@@ -73,8 +68,8 @@ export function GmPanel({ disabled, preview }: GmPanelProps) {
 
   const feeWei = gmFeeOnChain ?? GM_FEE_WEI;
   const feeLabel = formatEther(feeWei);
-  const freeLeft = preview ? 1 : Number(freeRemaining ?? FREE_GM_PER_DAY);
-  const isPaidGm = preview ? false : freeLeft === 0;
+  const freeLeft = Number(freeRemaining ?? FREE_GM_PER_DAY);
+  const isPaidGm = freeLeft === 0;
 
   const cooldownEnds = useMemo(() => {
     if (!lastGmAt || !minInterval) return 0;
@@ -83,12 +78,11 @@ export function GmPanel({ disabled, preview }: GmPanelProps) {
     return last + Number(minInterval);
   }, [lastGmAt, minInterval]);
 
-  const secondsLeft = preview ? 0 : Math.max(0, cooldownEnds - now);
-  const canGm = preview ? false : secondsLeft === 0;
+  const secondsLeft = Math.max(0, cooldownEnds - now);
+  const canGm = secondsLeft === 0;
 
-  const boostActive = preview
-    ? false
-    : boostActiveUntil != null && Number(boostActiveUntil) > now;
+  const boostActive =
+    boostActiveUntil != null && Number(boostActiveUntil) > now;
 
   const handleGm = () => {
     setLastEarned(pointsForGm(isPaidGm, boostActive));
@@ -112,25 +106,16 @@ export function GmPanel({ disabled, preview }: GmPanelProps) {
         </p>
       )}
       <div className="grid grid-cols-2 gap-2">
-        <Stat
-          label="Your GMs"
-          value={preview ? String(PREVIEW_GM_COUNT) : gmCount?.toString() ?? "0"}
-        />
-        <Stat
-          label="Points"
-          value={preview ? String(PREVIEW_POINTS) : points?.toString() ?? "0"}
-        />
-        <Stat
-          label="Free today"
-          value={`${freeLeft}/${FREE_GM_PER_DAY}`}
-        />
+        <Stat label="Your GMs" value={gmCount?.toString() ?? "0"} />
+        <Stat label="Points" value={points?.toString() ?? "0"} />
+        <Stat label="Free today" value={`${freeLeft}/${FREE_GM_PER_DAY}`} />
         <Stat label="Per GM" value={`+${freePts} / +${paidPts}`} />
       </div>
 
       <button
         type="button"
         onClick={handleGm}
-        disabled={disabled || preview || !canGm || isPending || isConfirming}
+        disabled={disabled || !canGm || isPending || isConfirming}
         className="uni-btn uni-btn-primary"
       >
         {!canGm

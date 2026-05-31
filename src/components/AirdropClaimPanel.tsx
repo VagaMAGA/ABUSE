@@ -12,21 +12,16 @@ import {
   claimProgressPercent,
   pointsUntilClaim,
 } from "@/config/airdrop";
-import {
-  PREVIEW_A_CLAIMED,
-  PREVIEW_CLAIM_POINTS,
-  PREVIEW_POINTS,
-} from "@/config/preview";
 import { useAirdrop } from "@/hooks/useAirdrop";
 import { useHubStats } from "@/hooks/useHubStats";
 
 type AirdropClaimPanelProps = {
-  isLiveMode: boolean;
+  canAct: boolean;
   onSuccess?: () => void;
 };
 
 export function AirdropClaimPanel({
-  isLiveMode,
+  canAct,
   onSuccess,
 }: AirdropClaimPanelProps) {
   const { points: livePoints, refreshStats } = useHubStats();
@@ -43,11 +38,7 @@ export function AirdropClaimPanel({
     reset,
   } = useAirdrop();
 
-  const userPoints = isLiveMode
-    ? (hookPoints ?? livePoints ?? BigInt(0))
-    : BigInt(PREVIEW_POINTS);
-  const displayClaimed = isLiveMode ? totalClaimed : PREVIEW_A_CLAIMED;
-  const displayBalance = isLiveMode ? tokenBalance : PREVIEW_A_CLAIMED;
+  const userPoints = hookPoints ?? livePoints ?? BigInt(0);
   const eligible = canClaimAirdrop(userPoints);
   const progress = claimProgressPercent(userPoints);
   const remaining = pointsUntilClaim(userPoints);
@@ -79,19 +70,10 @@ export function AirdropClaimPanel({
     [spendPoints],
   );
 
-  const actionsDisabled = !isLiveMode;
-
   return (
     <>
       <div className="uni-card px-4 py-4">
-        <div className="flex items-center justify-between gap-2">
-          <p className="uni-label">Your points</p>
-          {!isLiveMode && (
-            <span className="uni-caption text-[var(--uni-text-tertiary)]">
-              demo
-            </span>
-          )}
-        </div>
+        <p className="uni-label">Your points</p>
         <p className="uni-mono mt-1 text-3xl font-bold uni-text-accent">
           {userPoints.toString()}
         </p>
@@ -125,11 +107,11 @@ export function AirdropClaimPanel({
       <div className="grid grid-cols-2 gap-2">
         <div className="uni-card-inset px-3 py-2.5">
           <p className="uni-label">{TOKEN_SYMBOL} balance</p>
-          <p className="uni-mono mt-0.5 text-lg font-semibold">{displayBalance}</p>
+          <p className="uni-mono mt-0.5 text-lg font-semibold">{tokenBalance}</p>
         </div>
         <div className="uni-card-inset px-3 py-2.5">
           <p className="uni-label">Total claimed</p>
-          <p className="uni-mono mt-0.5 text-lg font-semibold">{displayClaimed}</p>
+          <p className="uni-mono mt-0.5 text-lg font-semibold">{totalClaimed}</p>
         </div>
       </div>
 
@@ -147,7 +129,7 @@ export function AirdropClaimPanel({
             max={Math.max(AIRDROP_MIN_POINTS, maxSpend)}
             step={POINTS_PER_A_TOKEN}
             value={Math.min(spendPoints, Math.max(AIRDROP_MIN_POINTS, maxSpend))}
-            disabled={!eligible || actionsDisabled}
+            disabled={!eligible || !canAct}
             onChange={(e) => setSpendPoints(Number(e.target.value))}
             className="mt-2 w-full accent-[var(--uni-pink)]"
           />
@@ -163,9 +145,7 @@ export function AirdropClaimPanel({
         <button
           type="button"
           className="uni-btn uni-btn-primary mt-4 w-full"
-          disabled={
-            actionsDisabled || !eligible || isPending || isConfirming
-          }
+          disabled={!canAct || !eligible || isPending || isConfirming}
           onClick={() => claim(BigInt(spendPoints))}
         >
           {isPending
@@ -175,9 +155,18 @@ export function AirdropClaimPanel({
               : `Claim ${receiveAmount.toFixed(2)} ${TOKEN_SYMBOL}`}
         </button>
 
-        {!eligible && !actionsDisabled && (
+        {!eligible && canAct && (
           <p className="uni-caption mt-3 text-center">
             Need at least {AIRDROP_MIN_POINTS} points to claim.
+          </p>
+        )}
+
+        {!canAct && (
+          <p className="uni-caption mt-3 text-center">
+            Connect on Base with token configured to claim.{" "}
+            <Link href="/?section=play&tab=gm" className="uni-link">
+              Farm points →
+            </Link>
           </p>
         )}
 
@@ -193,16 +182,6 @@ export function AirdropClaimPanel({
           </p>
         )}
       </div>
-
-      {!isLiveMode && (
-        <p className="uni-caption text-center">
-          Demo: {PREVIEW_CLAIM_POINTS} pts would claim{" "}
-          {aTokensForPoints(PREVIEW_CLAIM_POINTS).toFixed(1)} {TOKEN_SYMBOL}.{" "}
-          <Link href="/?section=play&tab=gm" className="uni-link">
-            Farm points →
-          </Link>
-        </p>
-      )}
     </>
   );
 }

@@ -6,17 +6,9 @@ import { useAccount, useChainId, useSwitchChain } from "wagmi";
 
 import { AppNav } from "@/components/AppNav";
 import { ConnectWallet } from "@/components/ConnectWallet";
-import { PreviewBanner } from "@/components/PreviewBanner";
 import { DEPLOY_CHAIN_ID } from "@/config/contract";
 import { POINTS_PER_REFERRAL } from "@/config/referral";
-import {
-  isHubLiveMode,
-  PREVIEW_CODE,
-  PREVIEW_POINTS,
-  PREVIEW_REFERRAL_COUNT,
-  PREVIEW_REFERRAL_POINTS,
-  PREVIEW_REFERRALS,
-} from "@/config/preview";
+import { isHubLiveMode } from "@/config/preview";
 import { useHubStats } from "@/hooks/useHubStats";
 import { useReferralCode } from "@/hooks/useReferralCode";
 import { useReferralList } from "@/hooks/useReferralList";
@@ -38,7 +30,7 @@ export function ReferralApp() {
   const chainId = useChainId();
   const { switchChain, isPending: isSwitching } = useSwitchChain();
   const wrongChain = isConnected && chainId !== DEPLOY_CHAIN_ID;
-  const isLiveMode = isHubLiveMode({ isConnected, wrongChain });
+  const canAct = isHubLiveMode({ isConnected, wrongChain });
 
   const { referralCount, points, refreshStats } = useHubStats();
   const {
@@ -79,32 +71,19 @@ export function ReferralApp() {
   }, [searchParams, hasRedeemed, setFriendCodeInput]);
 
   const referralPointsEarned = useMemo(() => {
-    if (!isLiveMode) return PREVIEW_REFERRAL_POINTS;
     const count = Number(referralCount ?? BigInt(0));
     return count * POINTS_PER_REFERRAL;
-  }, [isLiveMode, referralCount]);
-
-  const displayReferralCount = isLiveMode
-    ? referralCount?.toString() ?? "0"
-    : String(PREVIEW_REFERRAL_COUNT);
-  const displayPoints = isLiveMode
-    ? points?.toString() ?? "0"
-    : String(PREVIEW_POINTS);
-  const displayCode = isLiveMode ? myCode : PREVIEW_CODE;
-  const displayReferrals = isLiveMode ? referrals : PREVIEW_REFERRALS;
-  const displayCodeRegistered = isLiveMode ? isCodeRegistered : true;
-  const displayHasRedeemed = isLiveMode ? hasRedeemed : false;
-  const actionsDisabled = !isLiveMode;
+  }, [referralCount]);
 
   useEffect(() => {
-    if (!isLiveMode) return;
+    if (!canAct) return;
     if (registerSuccess || redeemSuccess) {
       void refresh();
       void refreshStats();
       void refreshReferrals();
     }
   }, [
-    isLiveMode,
+    canAct,
     registerSuccess,
     redeemSuccess,
     refresh,
@@ -113,9 +92,9 @@ export function ReferralApp() {
   ]);
 
   useEffect(() => {
-    if (!isLiveMode || !isConnected || referralCount == null) return;
+    if (!canAct || !isConnected || referralCount == null) return;
     void refreshReferrals();
-  }, [isLiveMode, isConnected, referralCount, refreshReferrals]);
+  }, [canAct, isConnected, referralCount, refreshReferrals]);
 
   const markFarmShared = useCallback(() => {
     if (typeof window !== "undefined") {
@@ -124,24 +103,24 @@ export function ReferralApp() {
   }, []);
 
   const handleCopyCode = useCallback(async () => {
-    if (!displayCode) return;
-    const ok = await copyToClipboard(displayCode);
+    if (!myCode) return;
+    const ok = await copyToClipboard(myCode);
     if (ok) {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2000);
     }
-  }, [displayCode]);
+  }, [myCode]);
 
   const handleShareX = useCallback(() => {
-    if (!displayCode || actionsDisabled) return;
-    shareOnX(displayCode);
+    if (!myCode || !canAct) return;
+    shareOnX(myCode);
     markFarmShared();
-  }, [displayCode, actionsDisabled, markFarmShared]);
+  }, [myCode, canAct, markFarmShared]);
 
   const handleShareFc = useCallback(() => {
-    if (!displayCode || actionsDisabled) return;
-    void shareOnFarcaster(displayCode, inMiniApp).then(markFarmShared);
-  }, [displayCode, actionsDisabled, inMiniApp, markFarmShared]);
+    if (!myCode || !canAct) return;
+    void shareOnFarcaster(myCode, inMiniApp).then(markFarmShared);
+  }, [myCode, canAct, inMiniApp, markFarmShared]);
 
   const codeInputInvalid =
     friendCodeInput.trim().length > 0 &&
@@ -163,13 +142,11 @@ export function ReferralApp() {
         </p>
       </header>
 
-      {!isLiveMode && <PreviewBanner />}
-
       <div className="uni-card px-4 py-5">
         <ConnectWallet />
       </div>
 
-      {wrongChain && isLiveMode && (
+      {wrongChain && (
         <button
           type="button"
           className="uni-btn uni-btn-primary"
@@ -180,59 +157,49 @@ export function ReferralApp() {
         </button>
       )}
 
-      {wrongChain && !isLiveMode && (
-        <button
-          type="button"
-          className="uni-btn uni-btn-primary"
-          disabled={isSwitching}
-          onClick={() => switchChain({ chainId: DEPLOY_CHAIN_ID })}
-        >
-          {isSwitching ? "Switching…" : "Switch to Base (for live play)"}
-        </button>
+      {!canAct && (
+        <p className="uni-caption text-center">
+          Connect on Base to activate and share your referral code.
+        </p>
       )}
 
-      {(isLiveMode ? isConnected && !wrongChain : true) && (
+      {canAct && (
         <>
           <div className="grid grid-cols-2 gap-2">
             <ReferralStat
               label="Friends joined"
-              value={displayReferralCount}
-              demo={!isLiveMode}
+              value={referralCount?.toString() ?? "0"}
             />
             <ReferralStat
               label="Points from codes"
               value={referralPointsEarned.toString()}
               accent
-              demo={!isLiveMode}
             />
           </div>
 
           <div className="uni-card px-4 py-4">
             <div className="flex items-center justify-between gap-2">
               <p className="uni-label">Friends who joined</p>
-              {isLiveMode && (
-                <button
-                  type="button"
-                  className="uni-link text-xs"
-                  disabled={referralsLoading}
-                  onClick={() => void refreshReferrals()}
-                >
-                  {referralsLoading ? "Loading…" : "Refresh"}
-                </button>
-              )}
+              <button
+                type="button"
+                className="uni-link text-xs"
+                disabled={referralsLoading}
+                onClick={() => void refreshReferrals()}
+              >
+                {referralsLoading ? "Loading…" : "Refresh"}
+              </button>
             </div>
             <p className="uni-caption mt-1">
               Wallets that redeemed your code (+{POINTS_PER_REFERRAL} pts each)
             </p>
 
-            {isLiveMode && referralsError && (
+            {referralsError && (
               <p className="uni-caption mt-3 text-[var(--uni-critical)]">
                 {referralsError}
               </p>
             )}
 
-            {isLiveMode &&
-              !referralsLoading &&
+            {!referralsLoading &&
               !referralsError &&
               Number(referralCount ?? BigInt(0)) === 0 && (
                 <p className="uni-caption mt-4 text-center">
@@ -240,8 +207,7 @@ export function ReferralApp() {
                 </p>
               )}
 
-            {isLiveMode &&
-              !referralsLoading &&
+            {!referralsLoading &&
               !referralsError &&
               Number(referralCount ?? BigInt(0)) > 0 &&
               referrals.length === 0 && (
@@ -250,9 +216,9 @@ export function ReferralApp() {
                 </p>
               )}
 
-            {displayReferrals.length > 0 && (
+            {referrals.length > 0 && (
               <ul className="mt-3 divide-y divide-[var(--uni-border)] border border-[var(--uni-border)]">
-                {displayReferrals.map((entry) => (
+                {referrals.map((entry) => (
                   <li
                     key={`${entry.referee}-${entry.transactionHash}`}
                     className="flex items-center justify-between gap-3 px-3 py-2.5"
@@ -282,7 +248,7 @@ export function ReferralApp() {
           <div className="uni-card px-4 py-4">
             <p className="uni-label">Your code</p>
             <p className="uni-mono mt-2 text-center text-3xl font-bold tracking-[0.2em] text-[var(--uni-pink)]">
-              {displayCode || "——"}
+              {myCode || "——"}
             </p>
             <p className="uni-caption mt-2 text-center">
               Unique to your wallet — share with friends
@@ -294,7 +260,7 @@ export function ReferralApp() {
             >
               {copied ? "Copied!" : "Copy code"}
             </button>
-            {!displayCodeRegistered && (
+            {!isCodeRegistered && (
               <>
                 <p className="uni-caption mt-3 text-center">
                   Activate once on-chain so others can redeem your code.
@@ -302,7 +268,7 @@ export function ReferralApp() {
                 <button
                   type="button"
                   className="uni-btn uni-btn-primary mt-3 w-full"
-                  disabled={actionsDisabled || isRegistering}
+                  disabled={isRegistering}
                   onClick={registerMyCode}
                 >
                   {isRegistering ? "Confirm in wallet…" : "Activate my code"}
@@ -314,17 +280,16 @@ export function ReferralApp() {
                 )}
               </>
             )}
-            {displayCodeRegistered && (
+            {isCodeRegistered && (
               <p className="uni-caption mt-3 text-center text-[var(--uni-success)]">
                 Code active — friends can redeem it
               </p>
             )}
-            {displayCode && displayCodeRegistered && (
+            {myCode && isCodeRegistered && (
               <div className="mt-4 grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   className="uni-btn uni-btn-secondary uni-btn-sm"
-                  disabled={actionsDisabled}
                   onClick={handleShareX}
                 >
                   Share on X
@@ -332,7 +297,6 @@ export function ReferralApp() {
                 <button
                   type="button"
                   className="uni-btn uni-btn-secondary uni-btn-sm"
-                  disabled={actionsDisabled}
                   onClick={() => void handleShareFc()}
                 >
                   Share on Farcaster
@@ -355,7 +319,7 @@ export function ReferralApp() {
               maxLength={REFERRAL_CODE_LENGTH}
               placeholder="ABC123"
               value={friendCodeInput}
-              disabled={actionsDisabled || displayHasRedeemed || isRedeeming}
+              disabled={hasRedeemed || isRedeeming}
               onChange={(e) => setFriendCodeInput(e.target.value)}
               className="uni-input uni-mono mt-3 text-center text-xl tracking-[0.15em] uppercase"
               aria-label="Friend referral code"
@@ -365,7 +329,7 @@ export function ReferralApp() {
                 Enter a valid {REFERRAL_CODE_LENGTH}-character code
               </p>
             )}
-            {displayHasRedeemed ? (
+            {hasRedeemed ? (
               <p className="uni-caption mt-3 text-center text-[var(--uni-success)]">
                 You already used a referral code (+{POINTS_PER_REFERRAL} pts)
               </p>
@@ -373,9 +337,7 @@ export function ReferralApp() {
               <button
                 type="button"
                 className="uni-btn uni-btn-primary mt-4 w-full"
-                disabled={
-                  actionsDisabled || !canRedeemFriendCode || isRedeeming
-                }
+                disabled={!canRedeemFriendCode || isRedeeming}
                 onClick={redeemFriendCode}
               >
                 {isRedeeming ? "Confirm in wallet…" : "Redeem code"}
@@ -409,11 +371,8 @@ export function ReferralApp() {
           <p className="uni-caption text-center">
             Total points:{" "}
             <span className="uni-mono uni-text-accent">
-              {displayPoints}
+              {points?.toString() ?? "0"}
             </span>
-            {!isLiveMode && (
-              <span className="text-[var(--uni-text-tertiary)]"> (demo)</span>
-            )}
           </p>
         </>
       )}
@@ -425,23 +384,14 @@ function ReferralStat({
   label,
   value,
   accent,
-  demo,
 }: {
   label: string;
   value: string;
   accent?: boolean;
-  demo?: boolean;
 }) {
   return (
     <div className="uni-card-inset px-3 py-2.5">
-      <p className="uni-label">
-        {label}
-        {demo && (
-          <span className="ml-1 text-[10px] font-normal uppercase tracking-wide text-[var(--uni-text-tertiary)]">
-            demo
-          </span>
-        )}
-      </p>
+      <p className="uni-label">{label}</p>
       <p
         className={`uni-mono mt-0.5 text-lg font-semibold ${accent ? "uni-text-accent" : "text-[var(--uni-text)]"}`}
       >

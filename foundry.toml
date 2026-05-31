@@ -20,4 +20,4 @@ solc = "0.8.24"
 optimizer = false
 
 [etherscan]
-base = { key = "${BASESCAN_API_KEY}", url = "https://api.basescan.org/api" }
+base = { key = "${ETHERSCAN_API_KEY}", chain = 8453 }

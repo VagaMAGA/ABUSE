@@ -28,7 +28,8 @@ contract Deploy is Script {
         hub.setAirdropToken(address(token));
         badges = new BadgeNFT(address(hub), rankSigner);
         stakePool = new StakePool(address(token));
-        token.transfer(address(stakePool), STAKE_REWARD_BUDGET);
+        token.approve(address(stakePool), STAKE_REWARD_BUDGET);
+        stakePool.fundRewards(STAKE_REWARD_BUDGET);
 
         vm.stopBroadcast();
 

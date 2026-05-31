@@ -262,11 +262,6 @@ contract Hub {
         _gm(msg.sender);
     }
 
-    function gmTo(address recipient) external payable {
-        require(recipient != address(0) && recipient != msg.sender, "invalid recipient");
-        _gm(recipient);
-    }
-
     function deployToken(
         string calldata name,
         string calldata symbol,

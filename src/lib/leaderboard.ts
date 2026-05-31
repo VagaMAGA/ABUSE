@@ -19,6 +19,21 @@ type Participant = {
   lastActive: bigint;
 };
 
+function ensureParticipant(
+  participants: Map<string, Participant>,
+  address: Address,
+) {
+  const key = address.toLowerCase();
+  if (!participants.has(key)) {
+    participants.set(key, {
+      points: BigInt(0),
+      gmCount: BigInt(0),
+      deployCount: BigInt(0),
+      lastActive: BigInt(0),
+    });
+  }
+}
+
 export function buildLeaderboardFromEvents(
   gmLogs: Array<{
     args: {
@@ -35,6 +50,17 @@ export function buildLeaderboardFromEvents(
       timestamp?: bigint;
     };
   }>,
+  referralLogs: Array<{
+    args: {
+      referrer?: Address;
+      referee?: Address;
+    };
+  }> = [],
+  airdropLogs: Array<{
+    args: {
+      user?: Address;
+    };
+  }> = [],
 ): LeaderboardEntry[] {
   const participants = new Map<string, Participant>();
 
@@ -74,6 +100,18 @@ export function buildLeaderboardFromEvents(
       deployCount: prev.deployCount + BigInt(1),
       lastActive: ts > prev.lastActive ? ts : prev.lastActive,
     });
+  }
+
+  for (const log of referralLogs) {
+    const referrer = log.args.referrer;
+    const referee = log.args.referee;
+    if (referrer) ensureParticipant(participants, referrer);
+    if (referee) ensureParticipant(participants, referee);
+  }
+
+  for (const log of airdropLogs) {
+    const user = log.args.user;
+    if (user) ensureParticipant(participants, user);
   }
 
   return Array.from(participants.entries())

@@ -82,6 +82,12 @@ async function fetchHubEventsChunked(
   const deployLogs: Awaited<
     ReturnType<BasePublicClient["getContractEvents"]>
   > = [];
+  const referralLogs: Awaited<
+    ReturnType<BasePublicClient["getContractEvents"]>
+  > = [];
+  const airdropLogs: Awaited<
+    ReturnType<BasePublicClient["getContractEvents"]>
+  > = [];
 
   for (let chunkStart = start; chunkStart <= latest; chunkStart += LOG_CHUNK_SIZE) {
     const chunkEnd =
@@ -89,34 +95,51 @@ async function fetchHubEventsChunked(
         ? latest
         : chunkStart + LOG_CHUNK_SIZE - 1n;
 
-    const [gmChunk, deployChunk] = await getLogsWithRetry(() =>
-      Promise.all([
-        client.getContractEvents({
-          address: HUB_CONTRACT_ADDRESS,
-          abi: hubAbi,
-          eventName: "GM",
-          fromBlock: chunkStart,
-          toBlock: chunkEnd,
-        }),
-        client.getContractEvents({
-          address: HUB_CONTRACT_ADDRESS,
-          abi: hubAbi,
-          eventName: "TokenDeployed",
-          fromBlock: chunkStart,
-          toBlock: chunkEnd,
-        }),
-      ]),
-    );
+    const [gmChunk, deployChunk, referralChunk, airdropChunk] =
+      await getLogsWithRetry(() =>
+        Promise.all([
+          client.getContractEvents({
+            address: HUB_CONTRACT_ADDRESS,
+            abi: hubAbi,
+            eventName: "GM",
+            fromBlock: chunkStart,
+            toBlock: chunkEnd,
+          }),
+          client.getContractEvents({
+            address: HUB_CONTRACT_ADDRESS,
+            abi: hubAbi,
+            eventName: "TokenDeployed",
+            fromBlock: chunkStart,
+            toBlock: chunkEnd,
+          }),
+          client.getContractEvents({
+            address: HUB_CONTRACT_ADDRESS,
+            abi: hubAbi,
+            eventName: "ReferralCodeRedeemed",
+            fromBlock: chunkStart,
+            toBlock: chunkEnd,
+          }),
+          client.getContractEvents({
+            address: HUB_CONTRACT_ADDRESS,
+            abi: hubAbi,
+            eventName: "AirdropClaimed",
+            fromBlock: chunkStart,
+            toBlock: chunkEnd,
+          }),
+        ]),
+      );
 
     gmLogs.push(...gmChunk);
     deployLogs.push(...deployChunk);
+    referralLogs.push(...referralChunk);
+    airdropLogs.push(...airdropChunk);
 
     if (chunkEnd < latest) {
       await sleep(CHUNK_DELAY_MS);
     }
   }
 
-  return { gmLogs, deployLogs };
+  return { gmLogs, deployLogs, referralLogs, airdropLogs };
 }
 
 export async function fetchLeaderboard(): Promise<{
@@ -130,15 +153,15 @@ export async function fetchLeaderboard(): Promise<{
   try {
     const client = createBasePublicClient();
     const fromBlock = hubDeployFromBlock();
-    const { gmLogs, deployLogs } = await fetchHubEventsChunked(
-      client,
-      fromBlock,
-    );
+    const { gmLogs, deployLogs, referralLogs, airdropLogs } =
+      await fetchHubEventsChunked(client, fromBlock);
 
     const entries = withRanks(
       buildLeaderboardFromEvents(
         gmLogs as Parameters<typeof buildLeaderboardFromEvents>[0],
         deployLogs as Parameters<typeof buildLeaderboardFromEvents>[1],
+        referralLogs as Parameters<typeof buildLeaderboardFromEvents>[2],
+        airdropLogs as Parameters<typeof buildLeaderboardFromEvents>[3],
       ),
     );
 

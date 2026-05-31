@@ -1,0 +1,17 @@
+# ABUSE — copy-paste amounts for Remix (18 decimals)
+
+## Your wallet balance (all you have for stake pool)
+50 $A
+50000000000000000000000
+
+## Step 3 — transfer to Hub (1 million)
+1000000000000000000000000
+
+## Step 7 approve + Step 8 fundRewards (use SAME line as 50 $A)
+50000000000000000000000
+
+## WRONG — do not use (5000 $A)
+5000000000000000000000
+
+## WRONG — do not use (50,000 $A)
+50000000000000000000000000

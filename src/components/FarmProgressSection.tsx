@@ -6,17 +6,6 @@ import { useCallback, useMemo, useState } from "react";
 import { FarmBoostButton } from "@/components/FarmBoostButton";
 import { TOKEN_SYMBOL } from "@/config/app";
 import {
-  PREVIEW_CODE,
-  PREVIEW_DAILY_DONE,
-  PREVIEW_DAILY_ITEMS,
-  PREVIEW_DAILY_TOTAL,
-  PREVIEW_FARM_GM,
-  PREVIEW_FARM_POINTS,
-  PREVIEW_SETUP_DONE,
-  PREVIEW_SETUP_ITEMS,
-  PREVIEW_SETUP_TOTAL,
-} from "@/config/preview";
-import {
   DAILY_FREE_GM_TARGET,
   DAILY_FREE_POINTS_MAX,
   farmRankForPoints,
@@ -34,7 +23,6 @@ import { shareOnFarcaster, shareOnX } from "@/lib/shareReferral";
 export type FarmTab = "today" | "setup" | "calc";
 
 type FarmProgressSectionProps = {
-  isLiveMode: boolean;
   showFarm: boolean;
   tab: FarmTab;
   onTabChange: (tab: FarmTab) => void;
@@ -42,15 +30,11 @@ type FarmProgressSectionProps = {
 
 export function FarmRankCard({
   pointsNum,
-  isLiveMode,
   boostDisabled,
-  boostPreview,
   onBoostSuccess,
 }: {
   pointsNum: number;
-  isLiveMode: boolean;
   boostDisabled?: boolean;
-  boostPreview?: boolean;
   onBoostSuccess?: () => void;
 }) {
   const rank = farmRankForPoints(pointsNum);
@@ -65,11 +49,6 @@ export function FarmRankCard({
         <p className="uni-title text-2xl">{rank.label}</p>
         <p className="uni-mono mt-1 text-lg font-semibold text-[var(--uni-pink)]">
           {pointsNum.toLocaleString()} pts
-          {!isLiveMode && (
-            <span className="ml-1 text-xs font-normal text-[var(--uni-text-tertiary)]">
-              demo
-            </span>
-          )}
         </p>
         {nextRank ? (
           <p className="uni-caption mt-1">
@@ -83,7 +62,6 @@ export function FarmRankCard({
       </div>
       <FarmBoostButton
         disabled={boostDisabled}
-        preview={boostPreview}
         onSuccess={onBoostSuccess}
       />
     </div>
@@ -91,7 +69,6 @@ export function FarmRankCard({
 }
 
 export function FarmProgressSection({
-  isLiveMode,
   showFarm,
   tab,
   onTabChange,
@@ -100,27 +77,17 @@ export function FarmProgressSection({
   const { inMiniApp } = useFarcasterMiniApp();
 
   const {
-    pointsNum: livePointsNum,
-    gmCount: liveGmCount,
-    myCode: liveMyCode,
-    dailyItems: liveDailyItems,
-    setupItems: liveSetupItems,
-    dailyDone: liveDailyDone,
-    dailyTotal: liveDailyTotal,
-    setupDone: liveSetupDone,
-    setupTotal: liveSetupTotal,
+    pointsNum,
+    gmCount,
+    myCode,
+    dailyItems,
+    setupItems,
+    dailyDone,
+    dailyTotal,
+    setupDone,
+    setupTotal,
     markShared,
   } = useFarmProgress();
-
-  const pointsNum = isLiveMode ? livePointsNum : PREVIEW_FARM_POINTS;
-  const gmCount = isLiveMode ? liveGmCount : PREVIEW_FARM_GM;
-  const myCode = isLiveMode ? liveMyCode : PREVIEW_CODE;
-  const dailyItems = isLiveMode ? liveDailyItems : PREVIEW_DAILY_ITEMS;
-  const setupItems = isLiveMode ? liveSetupItems : PREVIEW_SETUP_ITEMS;
-  const dailyDone = isLiveMode ? liveDailyDone : PREVIEW_DAILY_DONE;
-  const dailyTotal = isLiveMode ? liveDailyTotal : PREVIEW_DAILY_TOTAL;
-  const setupDone = isLiveMode ? liveSetupDone : PREVIEW_SETUP_DONE;
-  const setupTotal = isLiveMode ? liveSetupTotal : PREVIEW_SETUP_TOTAL;
 
   const dailyPct =
     dailyTotal > 0 ? Math.round((dailyDone / dailyTotal) * 100) : 0;
@@ -264,12 +231,8 @@ export function FarmProgressSection({
               · code <span className="uni-mono uni-text-accent">{myCode}</span>
             </>
           ) : null}
-          {!isLiveMode && (
-            <span className="text-[var(--uni-text-tertiary)]">
-              {" "}
-              · setup {setupDone}/{setupTotal}
-            </span>
-          )}
+          {" "}
+          · setup {setupDone}/{setupTotal}
         </p>
       </div>
     </>

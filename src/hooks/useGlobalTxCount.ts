@@ -14,7 +14,6 @@ import {
   hubAbi,
   isContractConfigured,
 } from "@/config/contract";
-import { PREVIEW_TOTAL_TXS } from "@/config/preview";
 import {
   isStakePoolConfigured,
   STAKE_POOL_ADDRESS,
@@ -119,7 +118,7 @@ export function useGlobalTxCount() {
 
   const totalTx = useMemo(() => {
     if (!hubEnabled) {
-      return BigInt(PREVIEW_TOTAL_TXS);
+      return BigInt(0);
     }
 
     let index = 0;
@@ -150,7 +149,6 @@ export function useGlobalTxCount() {
   return {
     totalTx,
     formatted: formatGlobalTxCount(totalTx),
-    isLive: hubEnabled,
     isLoading: hubEnabled && isLoading,
     refresh: refetch,
   };

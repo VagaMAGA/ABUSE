@@ -1,6 +1,6 @@
 /** Set after deploying AbuseToken.sol + Hub.setAirdropToken */
 export const ABUSE_TOKEN_ADDRESS: `0x${string}` =
-  "0x0000000000000000000000000000000000000000";
+  "0x3E9e193026FD2f8ec0b7718B73CC0244b49598c3";
 
 export const isAirdropTokenConfigured =
   ABUSE_TOKEN_ADDRESS !== "0x0000000000000000000000000000000000000000";

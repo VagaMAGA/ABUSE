@@ -25,9 +25,27 @@ export function poolDailyRewards(totalStaked: bigint): number {
   return userDailyRewards(totalStaked);
 }
 
-/** APY is fixed per staked token when the reward budget is sufficient */
-export function estimatedApyPercent(): number {
-  return STAKING_APY_PERCENT;
+const SECONDS_PER_YEAR = 365n * SECONDS_PER_DAY;
+
+/** Nominal APY when the reward budget fully covers emissions at current TVL */
+export function estimatedApyPercent(
+  rewardReserveWei = BigInt(Number.MAX_SAFE_INTEGER) * 10n ** 18n,
+  totalStakedWei = 0n,
+): number {
+  if (totalStakedWei === 0n || rewardReserveWei === 0n) {
+    return rewardReserveWei === 0n ? 0 : STAKING_APY_PERCENT;
+  }
+
+  const annualEmissionWei =
+    (REWARD_RATE_PER_STAKED_TOKEN * SECONDS_PER_YEAR * totalStakedWei) /
+    REWARD_SCALE;
+  if (annualEmissionWei === 0n) return STAKING_APY_PERCENT;
+  if (rewardReserveWei >= annualEmissionWei) return STAKING_APY_PERCENT;
+
+  const effective =
+    Number((rewardReserveWei * 100n * REWARD_SCALE) / (totalStakedWei * SECONDS_PER_YEAR)) /
+    Number(REWARD_RATE_PER_STAKED_TOKEN);
+  return Math.min(STAKING_APY_PERCENT, Math.max(0, Math.round(effective)));
 }
 
 export function canStake(amountWei: bigint): boolean {
