@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "brand": "node scripts/generate-brand-assets.mjs",
+    "screenshots": "node scripts/format-app-screenshots.mjs",
     "compile": "forge build",
     "test:contracts": "forge test",
     "deploy:sepolia": "bash scripts/deploy-contracts.sh base_sepolia",
