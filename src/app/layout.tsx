@@ -40,7 +40,11 @@ export const metadata: Metadata = {
   description: APP_DESCRIPTION,
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: [{ url: APP_ICON_PATH, type: "image/svg+xml" }],
+    icon: [
+      { url: APP_ICON_PATH, type: "image/png", sizes: "512x512" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
     title: FARCASTER_APP_NAME,
@@ -62,7 +66,8 @@ export default async function RootLayout({
     <html lang="en">
       <head>
         <link rel="manifest" href="/manifest.webmanifest" />
-        <link rel="icon" href={APP_ICON_PATH} type="image/svg+xml" />
+        <link rel="icon" href={APP_ICON_PATH} type="image/png" sizes="512x512" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
       </head>
       <body
         className={`${inter.variable} font-sans antialiased`}

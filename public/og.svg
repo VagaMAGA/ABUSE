@@ -55,11 +55,11 @@
     y="360"
     fill="#ff5070"
     font-family="system-ui, -apple-system, Segoe UI, sans-serif"
-    font-size="34"
+    font-size="30"
     font-weight="500"
-    letter-spacing="6"
+    letter-spacing="3"
   >
-    BASE MINI APP
+    GM. Deploy. Farm $A. On Base.
   </text>
   <rect x="620" y="392" width="420" height="6" fill="#ff2d55"/>
 </svg>

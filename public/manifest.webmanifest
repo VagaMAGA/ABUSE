@@ -2,7 +2,7 @@
   "id": "abuse",
   "name": "ABUSE",
   "short_name": "ABUSE",
-  "description": "ABUSE — Base mini app",
+  "description": "GM. Deploy. Farm $A. On Base.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -13,6 +13,12 @@
     {
       "src": "/icon.png",
       "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
       "type": "image/png",
       "purpose": "any"
     }
