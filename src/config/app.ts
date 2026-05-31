@@ -4,7 +4,8 @@ export const APP_SLUG = "abuse";
 /** In-app token / airdrop symbol shown in UI */
 export const TOKEN_SYMBOL = "$A";
 export const APP_TAGLINE = "GM. Deploy. Farm $A. On Base.";
-export const FARCASTER_SUBTITLE = "GM. Deploy. Farm $A. On Base.";
+/** Farcaster subtitle — no special chars ($ @ # etc.) per mini app validator */
+export const FARCASTER_SUBTITLE = "GM Deploy Farm A on Base";
 export const FARCASTER_DESCRIPTION =
   "GM, deploy tokens, refer friends, and earn NFT badges on Base.";
 /** Base mini app ID — https://docs.base.org/mini-apps (set after registering) */
