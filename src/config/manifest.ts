@@ -17,9 +17,11 @@ export const FARCASTER_ACCOUNT_ASSOCIATION: {
   payload: string;
   signature: string;
 } = {
-  header: "",
-  payload: "",
-  signature: "",
+  header:
+    "eyJmaWQiOjc3NzcyNiwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweGFGNTAxNkQ2REU4YjI3NUY0NEU0NjA2NzgzOTUwM0ZjMzg1RDIwZGQifQ",
+  payload: "eyJkb21haW4iOiJhYnVzZS1pb3RhLnZlcmNlbC5hcHAifQ",
+  signature:
+    "bRkx2Ic3NR2np3tPXTffLDb/8+MwxPMI40/2NYzVjHdVTsyQclbfSRAtHbVOuosze3O8HG08kBo3k2CBQBiGXBs=",
 };
 
 export const FARCASTER_BUTTON_TITLE = "Open app";

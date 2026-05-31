@@ -12,7 +12,7 @@ import {
 export const FARCASTER_APP_NAME = APP_NAME;
 
 /** Set after registering the mini app on Farcaster */
-export const FARCASTER_MINIAPP_URL = "";
+export const FARCASTER_MINIAPP_URL = "https://abuse-iota.vercel.app";
 
 export function getSiteUrl() {
   return CANONICAL_SITE_URL;
