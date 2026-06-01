@@ -674,6 +674,110 @@ a.uni-tab.uni-tab-active .uni-tab-tb-mark {
   min-width: 3.75rem;
 }
 
+.uni-app-nav-shell {
+  display: flex;
+  flex-direction: column;
+}
+
+.uni-app-nav-shell .uni-app-nav {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.uni-global-tx-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem 0.5rem;
+  width: 100%;
+  padding: 0.4375rem 0.75rem;
+  background: var(--uni-surface-2);
+  border: 1px solid var(--uni-border);
+  border-top: 1px solid rgba(255, 45, 85, 0.14);
+  box-shadow: var(--uni-shadow-card);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--uni-text-tertiary);
+}
+
+.uni-global-tx-bar-label {
+  color: var(--uni-text-secondary);
+}
+
+.uni-global-tx-bar-sep {
+  opacity: 0.45;
+  user-select: none;
+}
+
+.uni-global-tx-bar-value {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--uni-pink);
+}
+
+.uni-global-tx-bar-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--uni-accent-secondary);
+}
+
+.uni-global-tx-bar-pulse {
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  background: var(--uni-pink);
+  box-shadow: 0 0 6px var(--uni-pink-glow);
+  animation: uni-global-tx-pulse 2s ease-in-out infinite;
+}
+
+@keyframes uni-global-tx-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.85);
+  }
+}
+
+.uni-global-tx-bar-link {
+  margin-left: 0.125rem;
+  padding: 0.125rem 0.375rem;
+  border: 1px solid var(--uni-border);
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  color: var(--uni-text-secondary);
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.uni-global-tx-bar-link:hover {
+  color: var(--uni-pink);
+  border-color: var(--uni-accent-border);
+}
+
+@media (min-width: 380px) {
+  .uni-global-tx-bar {
+    font-size: 0.6875rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .uni-global-tx-bar-value {
+    font-size: 0.875rem;
+  }
+}
+
 .uni-farm-boost-shell {
   position: relative;
   flex-shrink: 0;

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { AppLogo } from "@/components/AppLogo";
-import { GlobalTxCounter } from "@/components/GlobalTxCounter";
+import { GlobalTxBar } from "@/components/GlobalTxBar";
 import { APP_NAME, TOKEN_SYMBOL } from "@/config/app";
 
 const links = [
@@ -19,16 +19,16 @@ export function AppNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="uni-card mb-3 flex w-full items-center gap-2 px-2 py-2 sm:px-3">
-      <Link
-        href="/"
-        className="uni-nav-brand-link flex shrink-0 items-center border-r border-[var(--uni-border)] pr-2 no-underline sm:pr-2.5"
-        aria-label={`${APP_NAME} home`}
-      >
-        <AppLogo size={32} />
-      </Link>
-      <GlobalTxCounter />
-      <div className="uni-tabs uni-tabs-compact min-w-0 flex-1 basis-0">
+    <header className="uni-app-nav-shell mb-3 w-full">
+      <nav className="uni-card uni-app-nav flex w-full items-center gap-2 px-2 py-2 sm:px-3">
+        <Link
+          href="/"
+          className="uni-nav-brand-link flex shrink-0 items-center border-r border-[var(--uni-border)] pr-2 no-underline sm:pr-2.5"
+          aria-label={`${APP_NAME} home`}
+        >
+          <AppLogo size={32} />
+        </Link>
+        <div className="uni-tabs uni-tabs-compact min-w-0 flex-1 basis-0">
         {links.map((link) => {
           const active =
             link.href === "/"
@@ -59,7 +59,9 @@ export function AppNav() {
             </Link>
           );
         })}
-      </div>
-    </nav>
+        </div>
+      </nav>
+      <GlobalTxBar />
+    </header>
   );
 }
