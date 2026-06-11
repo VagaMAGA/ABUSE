@@ -71,7 +71,6 @@ export function HomeApp() {
     deployCount,
     freeDeployAvailable,
     deployFeeOnChain,
-    points,
     boostActive,
     refreshStats,
   } = useHubStats();
@@ -85,31 +84,24 @@ export function HomeApp() {
     <>
       <AppNav />
 
-      <header className="uni-card px-5 py-5">
-        <p className="uni-eyebrow text-center">
+      <header className="uni-card px-4 py-3">
+        <p className="uni-eyebrow text-center text-[0.625rem]">
           {inMiniApp ? "Farcaster" : "Web"} · Base
         </p>
-        <div className="mt-2 flex w-full justify-center">
-          <div className="flex max-w-full flex-row flex-nowrap items-center justify-center gap-3.5">
-            <h1 className="uni-title shrink-0 text-3xl leading-none">{APP_NAME}</h1>
+        <div className="mt-1 flex w-full justify-center">
+          <div className="flex max-w-full flex-row flex-nowrap items-center justify-center gap-2.5">
+            <h1 className="uni-title shrink-0 text-2xl leading-none">{APP_NAME}</h1>
             <AirdropOrbLink />
           </div>
         </div>
-        <p className="uni-body mx-auto mt-2 max-w-sm text-center text-sm">
-          GM, Boost, deploy, farm points, and claim{" "}
+        <p className="uni-body mx-auto mt-1.5 max-w-sm text-center text-xs leading-snug">
+          GM, deploy, farm points — claim{" "}
           <span className="uni-text-accent font-semibold">{TOKEN_SYMBOL}</span> on
           Base.
         </p>
-        <div className="uni-airdrop-callout mt-4">
-          <p className="uni-airdrop-text">
-            More points = Bigger{" "}
-            <span className="uni-text-accent font-semibold">{TOKEN_SYMBOL}</span>{" "}
-            airdrop. Simple as that.
-          </p>
-        </div>
       </header>
 
-      <div className="uni-card px-4 py-5">
+      <div className="uni-card px-3 py-3">
         <ConnectWallet />
       </div>
 
@@ -132,14 +124,8 @@ export function HomeApp() {
 
       {showContent && (
         <>
-          <FarmRankCard
-            pointsNum={livePointsNum}
-            boostDisabled={!canAct}
-            onBoostSuccess={() => void refreshStats()}
-          />
-
-          <div className="uni-card px-2 py-2">
-            <div className="uni-tabs">
+          <div className="uni-card px-1.5 py-1.5">
+            <div className="uni-tabs uni-tabs-dense">
               <button
                 type="button"
                 className={`uni-tab ${section === "play" ? "uni-tab-active" : ""}`}
@@ -159,15 +145,8 @@ export function HomeApp() {
           </div>
 
           {section === "play" ? (
-            <div className="uni-card p-4">
-              <div className="uni-card-inset mb-4 flex items-center justify-between gap-2 px-3 py-2">
-                <p className="uni-label shrink-0 leading-none">Total points</p>
-                <p className="uni-mono text-lg font-semibold leading-none uni-text-accent">
-                  {points?.toString() ?? "0"}
-                </p>
-              </div>
-
-              <div className="uni-tabs mb-4">
+            <div className="uni-card p-3">
+              <div className="uni-tabs uni-tabs-dense mb-3">
                 <div className="uni-tab-wrap">
                   <button
                     type="button"
@@ -216,6 +195,12 @@ export function HomeApp() {
               onTabChange={setFarmTab}
             />
           )}
+
+          <FarmRankCard
+            pointsNum={livePointsNum}
+            boostDisabled={!canAct}
+            onBoostSuccess={() => void refreshStats()}
+          />
 
           <p className="uni-caption text-center">
             Deploys:{" "}

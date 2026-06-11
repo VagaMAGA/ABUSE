@@ -19,7 +19,7 @@ export function GlobalTxBar() {
       aria-live="polite"
       aria-label={`Total on-chain actions: ${exact}`}
     >
-      <span className="uni-global-tx-bar-label">Total on-chain actions</span>
+      <span className="uni-global-tx-bar-label">On-chain</span>
       <span className="uni-global-tx-bar-sep" aria-hidden>
         ·
       </span>

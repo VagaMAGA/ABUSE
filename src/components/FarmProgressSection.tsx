@@ -42,12 +42,12 @@ export function FarmRankCard({
   const ringPct = rankProgressPercent(pointsNum);
 
   return (
-    <div className="uni-card flex items-center gap-3 px-4 py-4">
+    <div className="uni-card flex items-center gap-2.5 px-3 py-2.5">
       <FarmRing percent={ringPct} />
       <div className="min-w-0 flex-1">
-        <p className="uni-label">Farm rank</p>
-        <p className="uni-title text-2xl">{rank.label}</p>
-        <p className="uni-mono mt-1 text-lg font-semibold text-[var(--uni-pink)]">
+        <p className="uni-label text-[0.625rem]">Farm rank</p>
+        <p className="uni-title text-xl leading-tight">{rank.label}</p>
+        <p className="uni-mono mt-0.5 text-base font-semibold leading-none text-[var(--uni-pink)]">
           {pointsNum.toLocaleString()} pts
         </p>
         {nextRank ? (
