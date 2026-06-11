@@ -92,7 +92,7 @@ export function FarmBoostButton({
   const priceLabel = isPaidBoost ? `${feeLabel} ETH` : "Free";
 
   return (
-    <div className="flex shrink-0 flex-col items-center gap-1">
+    <div className="flex shrink-0 flex-col items-end gap-1">
       <div
         className={`uni-farm-boost-shell ${active ? "uni-farm-boost-shell--live" : ""}`}
       >
@@ -125,7 +125,7 @@ export function FarmBoostButton({
         </button>
       </div>
       {writeError && (
-        <p className="max-w-[8rem] text-center text-[10px] leading-tight text-[var(--uni-critical)]">
+        <p className="max-w-[5.5rem] text-right text-[10px] leading-tight text-[var(--uni-critical)]">
           {writeError.message.split("\n")[0]}
         </p>
       )}

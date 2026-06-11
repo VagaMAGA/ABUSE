@@ -42,32 +42,28 @@ export function FarmRankCard({
   const ringPct = rankProgressPercent(pointsNum);
 
   return (
-    <div className="uni-card flex flex-col gap-2 px-3 py-2.5">
-      <div className="flex justify-center">
-        <FarmBoostButton
-          disabled={boostDisabled}
-          onSuccess={onBoostSuccess}
-        />
-      </div>
-      <div className="flex items-center gap-2.5">
-        <FarmRing percent={ringPct} />
-        <div className="min-w-0 flex-1">
-          <p className="uni-label text-[0.625rem]">Farm rank</p>
-          <p className="uni-title text-xl leading-tight">{rank.label}</p>
-          <p className="uni-mono mt-0.5 text-base font-semibold leading-none text-[var(--uni-pink)]">
-            {pointsNum.toLocaleString()} pts
+    <div className="uni-card flex items-center gap-2.5 px-3 py-2.5">
+      <FarmRing percent={ringPct} />
+      <div className="min-w-0 flex-1">
+        <p className="uni-label text-[0.625rem]">Farm rank</p>
+        <p className="uni-title text-xl leading-tight">{rank.label}</p>
+        <p className="uni-mono mt-0.5 text-base font-semibold leading-none text-[var(--uni-pink)]">
+          {pointsNum.toLocaleString()} pts
+        </p>
+        {nextRank ? (
+          <p className="uni-caption mt-1">
+            {ringPct}% to {nextRank.label} ({nextRank.minPoints} pts)
           </p>
-          {nextRank ? (
-            <p className="uni-caption mt-1">
-              {ringPct}% to {nextRank.label} ({nextRank.minPoints} pts)
-            </p>
-          ) : (
-            <p className="uni-caption mt-1 text-[var(--uni-success)]">
-              Max rank — keep farming
-            </p>
-          )}
-        </div>
+        ) : (
+          <p className="uni-caption mt-1 text-[var(--uni-success)]">
+            Max rank — keep farming
+          </p>
+        )}
       </div>
+      <FarmBoostButton
+        disabled={boostDisabled}
+        onSuccess={onBoostSuccess}
+      />
     </div>
   );
 }
