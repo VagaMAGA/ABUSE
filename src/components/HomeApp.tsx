@@ -124,6 +124,12 @@ export function HomeApp() {
 
       {showContent && (
         <>
+          <FarmRankCard
+            pointsNum={livePointsNum}
+            boostDisabled={!canAct}
+            onBoostSuccess={() => void refreshStats()}
+          />
+
           <div className="uni-card px-1.5 py-1.5">
             <div className="uni-tabs uni-tabs-dense">
               <button
@@ -195,12 +201,6 @@ export function HomeApp() {
               onTabChange={setFarmTab}
             />
           )}
-
-          <FarmRankCard
-            pointsNum={livePointsNum}
-            boostDisabled={!canAct}
-            onBoostSuccess={() => void refreshStats()}
-          />
 
           <p className="uni-caption text-center">
             Deploys:{" "}
