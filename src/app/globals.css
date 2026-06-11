@@ -484,6 +484,10 @@ body {
 }
 
 /* ── Tabs (Jumper-style segmented control) ── */
+.uni-nav-brand-cluster {
+  min-width: 0;
+}
+
 .uni-nav-brand-link {
   transition: opacity 0.15s ease;
 }
@@ -799,6 +803,118 @@ a.uni-tab.uni-tab-active .uni-tab-tb-mark {
 
   .uni-global-tx-bar-value {
     font-size: 0.8125rem;
+  }
+}
+
+/* Nav — compact boost orb beside logo */
+.uni-nav-boost-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.uni-nav-boost {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.12s ease;
+}
+
+.uni-nav-boost:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.uni-nav-boost:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.uni-nav-boost:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.uni-nav-boost-ring {
+  position: absolute;
+  inset: -2px;
+  z-index: 0;
+  padding: 2px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: conic-gradient(
+    from 0deg,
+    #ff2d55 0deg,
+    #ff6b35 90deg,
+    #ff5070 180deg,
+    #801825 270deg,
+    #ff2d55 360deg
+  );
+  animation: uni-nav-boost-ring-spin 4s linear infinite;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+.uni-nav-boost--live .uni-nav-boost-ring {
+  inset: -3px;
+  padding: 2px;
+  animation-duration: 1.4s;
+  filter: drop-shadow(0 0 8px rgba(255, 45, 85, 0.55));
+}
+
+.uni-nav-boost-face {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.625rem;
+  height: 1.625rem;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 45, 85, 0.35);
+  background:
+    linear-gradient(180deg, var(--uni-surface-3) 0%, var(--uni-bg) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.uni-nav-boost--live .uni-nav-boost-face {
+  border-color: rgba(255, 255, 255, 0.35);
+  background: var(--uni-gradient-primary);
+  box-shadow: var(--uni-shadow-glow);
+}
+
+.uni-nav-boost-mark {
+  font-size: 0.625rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--uni-pink);
+}
+
+.uni-nav-boost--live .uni-nav-boost-mark {
+  color: var(--uni-on-accent);
+}
+
+@keyframes uni-nav-boost-ring-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .uni-nav-boost-ring {
+    animation: none;
   }
 }
 

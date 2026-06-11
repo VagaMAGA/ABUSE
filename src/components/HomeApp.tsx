@@ -196,11 +196,7 @@ export function HomeApp() {
             />
           )}
 
-          <FarmRankCard
-            pointsNum={livePointsNum}
-            boostDisabled={!canAct}
-            onBoostSuccess={() => void refreshStats()}
-          />
+          <FarmRankCard pointsNum={livePointsNum} />
 
           <p className="uni-caption text-center">
             Deploys:{" "}

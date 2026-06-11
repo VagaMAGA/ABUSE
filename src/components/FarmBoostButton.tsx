@@ -19,6 +19,7 @@ import { useHubStats } from "@/hooks/useHubStats";
 type FarmBoostButtonProps = {
   disabled?: boolean;
   onSuccess?: () => void;
+  variant?: "default" | "nav";
 };
 
 function formatBoostTime(seconds: number) {
@@ -30,6 +31,7 @@ function formatBoostTime(seconds: number) {
 export function FarmBoostButton({
   disabled,
   onSuccess,
+  variant = "default",
 }: FarmBoostButtonProps) {
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
   const syncedTxHash = useRef<string | undefined>(undefined);
@@ -90,6 +92,44 @@ export function FarmBoostButton({
 
   const busy = isPending || isConfirming;
   const priceLabel = isPaidBoost ? `${feeLabel} ETH` : "Free";
+
+  const ariaLabel = active
+    ? `Boost active, ${formatBoostTime(secondsLeft)} left`
+    : busy
+      ? "Boost transaction in progress"
+      : `Activate ${BOOST_GM_MULTIPLIER}× boost · ${priceLabel}`;
+
+  if (variant === "nav") {
+    const navHint = busy
+      ? "…"
+      : active
+        ? secondsLeft > 0
+          ? formatBoostTime(secondsLeft)
+          : "…"
+        : priceLabel;
+
+    return (
+      <div className="uni-nav-boost-wrap shrink-0">
+        <button
+          type="button"
+          onClick={handleBoost}
+          disabled={disabled || busy}
+          className={`uni-nav-boost ${active ? "uni-nav-boost--live" : ""}`}
+          aria-label={ariaLabel}
+          title={
+            writeError
+              ? writeError.message.split("\n")[0]
+              : `${BOOST_GM_MULTIPLIER}× Boost · ${navHint}`
+          }
+        >
+          <span className="uni-nav-boost-ring" aria-hidden />
+          <span className="uni-nav-boost-face">
+            <span className="uni-nav-boost-mark">{BOOST_GM_MULTIPLIER}×</span>
+          </span>
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex shrink-0 flex-col items-end gap-1">

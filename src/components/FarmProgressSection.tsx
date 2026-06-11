@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 
-import { FarmBoostButton } from "@/components/FarmBoostButton";
 import { TOKEN_SYMBOL } from "@/config/app";
 import {
   DAILY_FREE_GM_TARGET,
@@ -28,15 +27,7 @@ type FarmProgressSectionProps = {
   onTabChange: (tab: FarmTab) => void;
 };
 
-export function FarmRankCard({
-  pointsNum,
-  boostDisabled,
-  onBoostSuccess,
-}: {
-  pointsNum: number;
-  boostDisabled?: boolean;
-  onBoostSuccess?: () => void;
-}) {
+export function FarmRankCard({ pointsNum }: { pointsNum: number }) {
   const rank = farmRankForPoints(pointsNum);
   const nextRank = nextFarmRank(pointsNum);
   const ringPct = rankProgressPercent(pointsNum);
@@ -60,10 +51,6 @@ export function FarmRankCard({
           </p>
         )}
       </div>
-      <FarmBoostButton
-        disabled={boostDisabled}
-        onSuccess={onBoostSuccess}
-      />
     </div>
   );
 }
