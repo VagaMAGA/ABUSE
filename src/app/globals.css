@@ -563,7 +563,7 @@ body {
 }
 
 .uni-gm-stats .uni-card-inset {
-  border-radius: calc(var(--uni-radius) - 2px);
+  border-radius: var(--uni-radius-md);
 }
 
 .uni-tab {

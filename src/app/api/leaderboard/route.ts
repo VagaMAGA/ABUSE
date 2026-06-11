@@ -8,7 +8,9 @@ const getCachedLeaderboard = unstable_cache(
   { revalidate: 60 },
 );
 
-export const revalidate = 60;
+/** Skip build-time prerender — leaderboard RPC scan exceeds the 60s build limit */
+export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 export async function GET() {
   try {
