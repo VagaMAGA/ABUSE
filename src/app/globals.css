@@ -806,7 +806,7 @@ a.uni-tab.uni-tab-active .uni-tab-tb-mark {
   }
 }
 
-/* Nav — compact boost orb beside logo */
+/* Nav — compact boost orb */
 .uni-nav-boost-wrap {
   display: flex;
   align-items: center;
@@ -817,8 +817,8 @@ a.uni-tab.uni-tab-active .uni-tab-tb-mark {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 2.375rem;
+  height: 2.375rem;
   padding: 0;
   border: none;
   background: transparent;
@@ -879,8 +879,8 @@ a.uni-tab.uni-tab-active .uni-tab-tb-mark {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 1.625rem;
-  height: 1.625rem;
+  width: 1.9375rem;
+  height: 1.9375rem;
   border-radius: 50%;
   border: 1px solid rgba(255, 45, 85, 0.35);
   background:
@@ -895,7 +895,7 @@ a.uni-tab.uni-tab-active .uni-tab-tb-mark {
 }
 
 .uni-nav-boost-mark {
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.02em;
